@@ -1,5 +1,10 @@
 package me.capit.urbanization;
 
+import java.io.File;
+import java.io.IOException;
+
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.RegisteredServiceProvider;
 
 import net.milkbowl.vault.chat.Chat;
@@ -37,6 +42,28 @@ public class DataController {
 			Urbanization.ECONOMY=econProvider.getProvider();
 		}
 		return this;
+	}
+	
+	public ConfigurationSection getGlobals(){
+		return plugin.getConfig().getConfigurationSection("globals");
+	}
+	
+	public File getInstanceFile(String instanceID){
+		return new File(plugin.getDataFolder().getPath()+File.separator+instanceID+".yml");
+	}
+	
+	public YamlConfiguration readInstance(File instance){
+		return YamlConfiguration.loadConfiguration(instance);
+	}
+	
+	public YamlConfiguration readInstance(String instanceID){
+		return readInstance(getInstanceFile(instanceID));
+	}
+	
+	public void writeInstance(String instanceID, String key, Object value) throws IOException{
+		YamlConfiguration c = readInstance(instanceID);
+		c.set(key, value);
+		c.save(getInstanceFile(instanceID));
 	}
 	
 }

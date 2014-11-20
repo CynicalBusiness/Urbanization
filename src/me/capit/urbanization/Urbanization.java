@@ -14,6 +14,8 @@ public class Urbanization extends JavaPlugin {
 	public static Economy ECONOMY; public static Chat CHAT;
 	public static DataController CONTROLLER;
 	
+	
+	
 	public void onEnable(){
 		CONSOLE = getServer().getConsoleSender();
 		CONTROLLER = new DataController(this);
