@@ -10,7 +10,7 @@ commands:
   urbanization:
     description: Basic Urbanization command.
     usage: '/urbanization help'
-    aliases: ['urban','u']
+    aliases: ['urban','u','group','g']
 
 permissions:
   urbanization.*:
