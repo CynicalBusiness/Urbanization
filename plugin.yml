@@ -1,0 +1,20 @@
+main: me.capit.urbanization.Urbanization
+version: 1.00R01
+name: Urbanization
+
+author: Wehttam664
+softdepend: TagAPI
+depend: Vault
+
+commands:
+  urbanization:
+    description: Basic Urbanization command.
+    usage: '/urbanization help'
+    aliases: ['urban','u']
+
+permissions:
+  urbanization.*:
+    description: Global Urbanization permission.
+    children:
+      - urbanization.kit
+      - urbanization.static
