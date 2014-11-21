@@ -1,6 +1,9 @@
 package me.capit.urbanization.group;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import org.bukkit.configuration.ConfigurationSection;
 
 public class Subgroup {
 	private String name;
@@ -29,4 +32,11 @@ public class Subgroup {
 		return name;
 	}
 	
+	public void addToConfigEntry(ConfigurationSection c, int ID){
+		ConfigurationSection cs = c.createSection(String.valueOf(ID));
+		List<String> p = new ArrayList<String>();
+		for (GroupPermission gp : perms){p.add(gp.toString());}
+		cs.set("PERMISSIONS", p);
+		cs.set("NAME", name);
+	}
 }

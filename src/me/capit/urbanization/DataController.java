@@ -49,7 +49,16 @@ public class DataController {
 	}
 	
 	public File getInstanceFile(String instanceID){
-		return new File(plugin.getDataFolder().getPath()+File.separator+instanceID+".yml");
+		File f = new File(plugin.getDataFolder().getPath()+File.separator+instanceID+".yml");
+		if (!f.exists()){
+			try {
+				f.createNewFile();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		return f;
 	}
 	
 	public YamlConfiguration readInstance(File instance){

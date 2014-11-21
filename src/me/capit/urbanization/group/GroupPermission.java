@@ -16,4 +16,10 @@ public class GroupPermission {
 		return true;
 	}
 	
+	public String toString(){
+		String out = "";
+		for (String s : KEY){out+=s;}
+		return out;
+	}
+	
 }
