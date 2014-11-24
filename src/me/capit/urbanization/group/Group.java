@@ -12,23 +12,26 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 public class Group {
-	public static final int subgroupSize = 64;
+	public static final int subgroupSize = 255;
 	public final String ID;
 	private final YamlConfiguration instance;
 	
 	private String name,desc,tag,motd;
 	private List<GroupPlayer> players = new ArrayList<GroupPlayer>();
-	private Subgroup[] subgroups = new Subgroup[subgroupSize];
+	private Subgroup[] subgroups = new Subgroup[subgroupSize+1];
+	private double funds = 0;
 	
 	public static Group createNewGroup(String name, UUID owner) throws IOException{
 		String tid = String.valueOf(System.currentTimeMillis());
 		YamlConfiguration file = Urbanization.CONTROLLER.readInstance(tid);
 		file.set("NAME", name); file.set("TAG", name.substring(0, 3).toUpperCase());
 		file.set("DESC", "Default Group Description"); file.set("MOTD", "");
+		file.set("FUNDS", 0);
 		
 		ConfigurationSection groups = file.createSection("GROUPS");
 		new Subgroup("Admin").addPermission(new GroupPermission("group.*")).addToConfigEntry(groups, 0);
-		new Subgroup("Member").addPermission(new GroupPermission("group.build.*")).addToConfigEntry(groups, subgroupSize);
+		new Subgroup("Default").addPermission(new GroupPermission("group.build.*")).addToConfigEntry(groups, subgroupSize-1);
+		new Subgroup("Guest").addPermission(new GroupPermission("")).addToConfigEntry(groups, subgroupSize);
 		
 		file.set("PLAYERS", Arrays.asList(new GroupPlayer(owner, 0)));
 		
@@ -43,6 +46,7 @@ public class Group {
 		instance = Urbanization.CONTROLLER.readInstance(ID);
 		name=instance.getString("NAME"); desc=instance.getString("DESC");
 		tag=instance.getString("TAG"); motd=instance.getString("MOTD");
+		funds=instance.getDouble("FUNDS");
 		
 		for (String key : instance.getConfigurationSection("PLAYERS").getKeys(false)){
 			players.add(new GroupPlayer(UUID.fromString(key), instance.getInt("PLAYERS."+key)));
@@ -64,6 +68,11 @@ public class Group {
 	
 	public String tag(){return tag;}
 	public void tag(String tag){this.tag=tag;}
+	
+	public double funds(){return funds;}
+	public void funds(double funds){this.funds=funds;}
+	public boolean hasFunds(double f){return funds>=f;}
+	public void deposit(double f){funds+=f;}
 	
 	public boolean groupExistsAtRank(int rank){
 		return getGroupAt(rank)!=null;
