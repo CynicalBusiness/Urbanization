@@ -27,7 +27,7 @@ public class Urbanization extends JavaPlugin {
 		CONSOLE = getServer().getConsoleSender();
 		CONTROLLER = new DataController(this);
 		
-		CONSOLE.sendMessage(ChatColor.WHITE+"---- "+ChatColor.AQUA+"Urbanization"+ChatColor.WHITE+" ------------------");
+		CONSOLE.sendMessage(ChatColor.WHITE+"---- "+ChatColor.AQUA+"Urbanization"+ChatColor.WHITE+" -------------------");
 		CONTROLLER.createEconomyProvider();
 		CONSOLE.sendMessage(ChatColor.WHITE+"Loading groups...");
 		for (File gfile : getDataFolder().listFiles()){
@@ -41,7 +41,7 @@ public class Urbanization extends JavaPlugin {
 		getCommand("urbanization").setExecutor(COMMANDS);
 		
 		CONSOLE.sendMessage(ChatColor.WHITE+"Finished!");
-		CONSOLE.sendMessage(ChatColor.WHITE+"------------------------------------");
+		CONSOLE.sendMessage(ChatColor.WHITE+"-------------------------------------");
 	}
 	
 	public void onDisable(){
