@@ -63,8 +63,12 @@ public class CommandController implements CommandExecutor{
 	
 	CommandInfo[][] help = new CommandInfo[][]{
 			new CommandInfo[]{
-				
-			}
+					new CommandInfo("create <name>", "Creates a new group by <name>."),
+			},
+			new CommandInfo[]{
+					new CommandInfo("permission <group> add|take <permission>", "Adds or takes <permission> from <group>."),
+					new CommandInfo("&cdisband", "Disbands your group."),
+			},
 	};
 	public void echoHelp(CommandSender s){echoHelp(s,1);}
 	public void echoHelp(CommandSender s, int page){
@@ -110,6 +114,12 @@ public class CommandController implements CommandExecutor{
 						} else {
 							return CResponse.FAILED_FORMAT;
 						}
+					} else {
+						return CResponse.FAILED_PERMISSION;
+					}
+				} else if (sc.equalsIgnoreCase("disband")){
+					if (s.hasPermission("urbanization.kit.player") || s.hasPermission("urbanization.group.disband")){
+						
 					} else {
 						return CResponse.FAILED_PERMISSION;
 					}

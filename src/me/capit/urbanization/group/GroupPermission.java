@@ -7,7 +7,12 @@ public class GroupPermission {
 		KEY = permissionKey.split(".");
 	}
 	
-	public boolean matches(GroupPermission p){
+	@Override
+	public boolean equals(Object o){
+		return o instanceof GroupPermission ? equals((GroupPermission) o) : false;
+	}
+	
+	public boolean equals(GroupPermission p){
 		for (int i = 0; i<(Math.max(KEY.length, p.KEY.length)); i++){
 			if (i<KEY.length && i<p.KEY.length){
 				if (!KEY[i].equalsIgnoreCase(p.KEY[i]) && !(KEY[i].equals("*") || p.KEY[i].equals("*"))) return false;
@@ -21,5 +26,6 @@ public class GroupPermission {
 		for (String s : KEY){out+=s;}
 		return out;
 	}
+	
 	
 }

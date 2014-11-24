@@ -1,9 +1,6 @@
 package me.capit.urbanization.group;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.UUID;
 
 import me.capit.urbanization.Urbanization;
@@ -17,7 +14,6 @@ public class Group {
 	private final YamlConfiguration instance;
 	
 	private String name,desc,tag,motd;
-	private List<GroupPlayer> players = new ArrayList<GroupPlayer>();
 	private Subgroup[] subgroups = new Subgroup[subgroupSize+1];
 	private double funds = 0;
 	
@@ -29,12 +25,9 @@ public class Group {
 		file.set("FUNDS", 0);
 		
 		ConfigurationSection groups = file.createSection("GROUPS");
-		new Subgroup("Admin").addPermission(new GroupPermission("group.*")).addToConfigEntry(groups, 0);
-		new Subgroup("Default").addPermission(new GroupPermission("group.build.*")).addToConfigEntry(groups, subgroupSize-1);
-		new Subgroup("Guest").addPermission(new GroupPermission("")).addToConfigEntry(groups, subgroupSize);
-		
-		file.set("PLAYERS", Arrays.asList(new GroupPlayer(owner, 0)));
-		
+		new Subgroup("Admin", 0).addPermission(new GroupPermission("group.*")).addPlayer(owner).addToConfigEntry(groups, 0);
+		new Subgroup("Default", subgroupSize-1).addPermission(new GroupPermission("group.build.*")).addToConfigEntry(groups, subgroupSize-1);
+		new Subgroup("Guest", subgroupSize).addPermission(new GroupPermission("")).addToConfigEntry(groups, subgroupSize);
 		
 		file.save(Urbanization.CONTROLLER.getInstanceFile(tid));
 		Group g = new Group(tid);
@@ -48,8 +41,10 @@ public class Group {
 		tag=instance.getString("TAG"); motd=instance.getString("MOTD");
 		funds=instance.getDouble("FUNDS");
 		
-		for (String key : instance.getConfigurationSection("PLAYERS").getKeys(false)){
-			players.add(new GroupPlayer(UUID.fromString(key), instance.getInt("PLAYERS."+key)));
+		for (String key : instance.getConfigurationSection("GROUPS").getKeys(false)){
+			ConfigurationSection sec = instance.getConfigurationSection("GROUPS."+key);
+			Subgroup g = Subgroup.buildFromConfig(sec);
+			subgroups[g.ID] = g;
 		}
 	}
 	
@@ -80,5 +75,26 @@ public class Group {
 	
 	public Subgroup getGroupAt(int rank){
 		return rank<subgroups.length ? subgroups[rank] : null;
+	}
+	
+	public Subgroup getPlayerGroup(UUID player){
+		for (Subgroup g : subgroups){
+			if (g.hasPlayer(player)) return g;
+		}
+		return null;
+	}
+	
+	public boolean hasPlayer(UUID player){
+		return getPlayerGroup(player)!=null;
+	}
+	
+	public boolean playerHasPermissionAtSubgroup(UUID player, String perm){
+		return playerHasPermissionAtSubgroup(player, new GroupPermission(perm));
+	}
+	public boolean playerHasPermissionAtSubgroup(UUID player, GroupPermission perm){
+		if (hasPlayer(player)){
+			return true; // TODO
+		}
+		return false;
 	}
 }

@@ -53,7 +53,7 @@ public class DataController {
 	}
 	
 	public File getInstanceFile(String instanceID){
-		File f = new File(plugin.getDataFolder().getPath()+File.separator+instanceID+".yml");
+		File f = new File(plugin.getDataFolder().getPath()+File.separator+"groups"+File.separator+instanceID+".yml");
 		if (!f.exists()){
 			try {
 				f.createNewFile();
