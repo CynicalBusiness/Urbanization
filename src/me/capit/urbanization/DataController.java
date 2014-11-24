@@ -48,6 +48,10 @@ public class DataController {
 		return plugin.getConfig().getConfigurationSection("globals");
 	}
 	
+	public ConfigurationSection getGroupData(){
+		return plugin.getConfig().getConfigurationSection("groups");
+	}
+	
 	public File getInstanceFile(String instanceID){
 		File f = new File(plugin.getDataFolder().getPath()+File.separator+instanceID+".yml");
 		if (!f.exists()){
