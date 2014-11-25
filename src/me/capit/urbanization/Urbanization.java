@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import me.capit.urbanization.group.Group;
 import net.milkbowl.vault.chat.Chat;
@@ -57,5 +58,32 @@ public class Urbanization extends JavaPlugin {
 		
 	}
 	
+	public boolean playerInGroup(UUID player){
+		return getGroupByPlayer(player)!=null;
+	}
+	
+	public static Group getGroupByPlayer(UUID player){
+		for (Group g : groups){
+			if (g.hasPlayer(player)) return g;
+		}
+		return null;
+	}
+	
+	public static Group getGroupByID(String ID){
+		for (Group g : groups){
+			if (g.ID.equals(ID)) return g;
+		}
+		return null;
+	}
+	
+	public static Group getGroupByTerritory(int x, int z){
+		for (Group g : groups){
+			if (g.territoryBelongsToGroup(x, z)) return g;
+		}
+		return null;
+	}
+	public static boolean territoryClaimed(int x, int z){
+		return getGroupByTerritory(x,z)!=null;
+	}
 	
 }

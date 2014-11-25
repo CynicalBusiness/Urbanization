@@ -63,8 +63,8 @@ public class Subgroup {
 		return players;
 	}
 	
-	public void addToConfigEntry(ConfigurationSection c, int ID){
-		ConfigurationSection cs = c.createSection(String.valueOf(ID));
+	public void addToConfigEntry(ConfigurationSection c){
+		ConfigurationSection cs = c.contains(String.valueOf(ID)) ? c.createSection(String.valueOf(ID)) : c.getConfigurationSection(String.valueOf(ID));
 		List<String> p = new ArrayList<String>();
 		List<String> u = new ArrayList<String>();
 		for (GroupPermission gp : perms){p.add(gp.toString());}
