@@ -62,6 +62,10 @@ public class Group {
 		instance.save(Urbanization.CONTROLLER.getInstanceFile(ID));
 	}
 	
+	public void delete(){
+		Urbanization.CONTROLLER.getInstanceFile(ID).delete();
+	}
+	
 	public String name(){return name;}
 	public void name(String name){this.name=name;}
 	

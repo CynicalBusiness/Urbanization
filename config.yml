@@ -1,4 +1,5 @@
 globals:
+  enable_debug: false
   enable_economy: true
   
   

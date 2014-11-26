@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import me.capit.urbanization.group.Group;
 import net.milkbowl.vault.chat.Chat;
@@ -17,6 +19,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class Urbanization extends JavaPlugin {
 	public static ConsoleCommandSender CONSOLE;
+	public static Logger LOGGER;
 	public static Permission PERMISSION;
 	public static Economy ECONOMY; public static Chat CHAT;
 	public static DataController CONTROLLER;
@@ -26,10 +29,16 @@ public class Urbanization extends JavaPlugin {
 	
 	public void onEnable(){
 		CONSOLE = getServer().getConsoleSender();
+		LOGGER = getLogger();
 		CONTROLLER = new DataController(this);
 		
 		CONSOLE.sendMessage(ChatColor.WHITE+"---- "+ChatColor.AQUA+"Urbanization"+ChatColor.WHITE+" -------------------");
 		CONTROLLER.createEconomyProvider();
+		
+		LOGGER.setLevel(CONTROLLER.getGlobals().getBoolean("enable_debug") ? Level.FINE : Level.INFO);
+		if (CONTROLLER.getGlobals().getBoolean("enable_debug")) 
+			CONSOLE.sendMessage(ChatColor.YELLOW+"Debug"+ChatColor.WHITE+" mode is "+ChatColor.BLUE+"enabled"+ChatColor.WHITE+".");
+		
 		CONSOLE.sendMessage(ChatColor.WHITE+"Loading groups...");
 		for (File gfile : getDataFolder().listFiles()){
 			Group g = new Group(gfile.getName().replaceFirst("[.][^.]+$", ""));
@@ -82,6 +91,7 @@ public class Urbanization extends JavaPlugin {
 		}
 		return null;
 	}
+	
 	public static boolean territoryClaimed(int x, int z){
 		return getGroupByTerritory(x,z)!=null;
 	}
