@@ -233,8 +233,7 @@ public class CommandController implements CommandExecutor, Listener{
 						Group g = Urbanization.getGroupByPlayer(p.getUniqueId());
 						if (g!=null){
 							if (g.playerHasPermission(p.getUniqueId(), "territory.claim")){
-								if (!Urbanization.CONTROLLER.getGlobals().getBoolean("enable_economy") 
-										|| g.hasFunds(Urbanization.CONTROLLER.getGroupData().getDouble("econ_cost_claim"))){
+								if (g.hasFunds(Urbanization.CONTROLLER.getGroupData().getDouble("econ_cost_claim"))){
 									Group atPos = Urbanization.getGroupByTerritory(p.getLocation().getChunk().getX(), p.getLocation().getChunk().getZ());
 									if (atPos==null){
 										int rank = args.length>=2 ? Integer.parseInt(args[1]) : Group.subgroupSize;
@@ -304,6 +303,71 @@ public class CommandController implements CommandExecutor, Listener{
 						}
 					} else {
 						return CResponse.FAILED_PERMISSION;
+					}
+				} else if (sc.equalsIgnoreCase("modify")){
+					if (args.length==3){
+						if (s.hasPermission("urbanization.kit.player") || s.hasPermission("urbanization.modify")){
+							String ssc = args[1];
+							Group g = Urbanization.getGroupByPlayer(p.getUniqueId());
+							if (g!=null){
+								if (ssc.equalsIgnoreCase("name")){
+									if (args[2].matches(Urbanization.CONTROLLER.getGroupData().getString("name_pattern"))){
+										if (g.playerHasPermission(p.getUniqueId(), "group.modify.name")){
+											if (g.hasFunds(Urbanization.CONTROLLER.getGroupData().getDouble("econ_cost_name"))){
+												g.name(args[2]);
+												if (Urbanization.CONTROLLER.getGlobals().getBoolean("enable_economy"))
+													g.funds(g.funds()-Urbanization.CONTROLLER.getGroupData().getDouble("econ_cost_name"));
+												return CResponse.SUCCESS;
+											} else {
+												return CResponse.FAILED_GROUP_FUNDS;
+											}
+										} else {
+											return CResponse.FAILED_GROUP_PERMISSION;
+										}
+									} else {
+										return CResponse.FAILED_FORMAT;
+									}
+								} else if (ssc.equalsIgnoreCase("tag")){
+									if (args[2].matches(Urbanization.CONTROLLER.getGroupData().getString("tag_pattern"))){
+										if (g.playerHasPermission(p.getUniqueId(), "group.modify.tag")){
+											if (g.hasFunds(Urbanization.CONTROLLER.getGroupData().getDouble("econ_cost_tag"))){
+												g.tag(args[2]);
+												if (Urbanization.CONTROLLER.getGlobals().getBoolean("enable_economy"))
+													g.funds(g.funds()-Urbanization.CONTROLLER.getGroupData().getDouble("econ_cost_tag"));
+												return CResponse.SUCCESS;
+											} else {
+												return CResponse.FAILED_GROUP_FUNDS;
+											}
+										} else {
+											return CResponse.FAILED_GROUP_PERMISSION;
+										}
+									} else {
+										return CResponse.FAILED_FORMAT;
+									}
+								} else if (ssc.equalsIgnoreCase("desc")){
+									if (g.playerHasPermission(p.getUniqueId(), "group.modify.desc")){
+										if (g.hasFunds(Urbanization.CONTROLLER.getGroupData().getDouble("econ_cost_desc"))){
+											g.name(args[2]);
+											if (Urbanization.CONTROLLER.getGlobals().getBoolean("enable_economy"))
+												g.funds(g.funds()-Urbanization.CONTROLLER.getGroupData().getDouble("econ_cost_desc"));
+											return CResponse.SUCCESS;
+										} else {
+											return CResponse.FAILED_GROUP_FUNDS;
+										}
+									} else {
+										return CResponse.FAILED_GROUP_PERMISSION;
+									}
+								} else {
+									return CResponse.FAILED_ARGUMENTS;
+								}
+							} else {
+								return CResponse.FAILED_NOT_IN_GROUP;
+							}
+						} else {
+							return CResponse.FAILED_PERMISSION;
+						}
+					} else {
+						return CResponse.FAILED_ARGUMENT_COUNT;
 					}
 				} else if (sc.equalsIgnoreCase("help")){
 					if (s.hasPermission("urbanization.kit.player") || s.hasPermission("urbanization.help")){
