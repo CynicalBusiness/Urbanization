@@ -3,12 +3,14 @@ package me.capit.urbanization;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import me.capit.urbanization.group.Group;
+import me.capit.urbanization.group.Territory;
 import net.milkbowl.vault.chat.Chat;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.permission.Permission;
@@ -25,6 +27,7 @@ public class Urbanization extends JavaPlugin {
 	public static DataController CONTROLLER;
 	public static CommandController COMMANDS;
 	public static List<Group> groups = new ArrayList<Group>();
+	public static HashMap<UUID, String> trackedPlayers = new HashMap<UUID, String>();
 	
 	
 	public void onEnable(){
@@ -49,6 +52,7 @@ public class Urbanization extends JavaPlugin {
 		CONSOLE.sendMessage(ChatColor.WHITE+"Hooking data...");
 		COMMANDS = new CommandController(this);
 		getCommand("urbanization").setExecutor(COMMANDS);
+		getServer().getPluginManager().registerEvents(COMMANDS, this);
 		
 		CONSOLE.sendMessage(ChatColor.WHITE+"Finished!");
 		CONSOLE.sendMessage(ChatColor.WHITE+"-------------------------------------");
@@ -94,6 +98,21 @@ public class Urbanization extends JavaPlugin {
 	
 	public static boolean territoryClaimed(int x, int z){
 		return getGroupByTerritory(x,z)!=null;
+	}
+	
+	public static void deleteGroupByID(String ID){
+		for (int i=0; i<groups.size(); i++){
+			Group g = groups.get(i);
+			if (g.ID.equals(ID)){
+				groups.remove(i);
+				g.delete();
+			}
+		}
+	}
+	
+	public static Territory getTerritory(int x, int z){
+		Group g = getGroupByTerritory(x,z);
+		return g!=null ? g.getTerritoryAt(x, z) : null;
 	}
 	
 }

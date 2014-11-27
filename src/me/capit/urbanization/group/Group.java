@@ -7,8 +7,12 @@ import java.util.UUID;
 
 import me.capit.urbanization.Urbanization;
 
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
 
 public class Group {
 	public static final int subgroupSize = 255;
@@ -28,9 +32,8 @@ public class Group {
 		file.set("FUNDS", 0); file.set("TERRITORY", new ArrayList<String>());
 		
 		ConfigurationSection groups = file.createSection("GROUPS");
-		new Subgroup("Admin", 0).addPermission(new GroupPermission("group.*")).addPlayer(owner).addToConfigEntry(groups);
-		new Subgroup("Default", subgroupSize-1).addPermission(new GroupPermission("group.build.*")).addToConfigEntry(groups);
-		new Subgroup("Guest", subgroupSize).addPermission(new GroupPermission("")).addToConfigEntry(groups);
+		new Subgroup("Admin", 0).addPermission(new GroupPermission("*")).addPlayer(owner).addToConfigEntry(groups);
+		new Subgroup("Default", subgroupSize).addPermission(new GroupPermission("build.*")).addToConfigEntry(groups);
 		
 		file.save(Urbanization.CONTROLLER.getInstanceFile(tid));
 		Group g = new Group(tid);
@@ -63,6 +66,13 @@ public class Group {
 	}
 	
 	public void delete(){
+		OfflinePlayer owner = Bukkit.getServer().getPlayer(subgroups[0].getPlayers().get(0));
+		if (owner.isOnline()){
+			Player p = (Player) owner;
+			p.sendMessage(ChatColor.YELLOW+"The "+ChatColor.RED+funds+ChatColor.YELLOW+" "+
+					Urbanization.ECONOMY.currencyNamePlural()+" from the group back has been added to your account.");
+		}
+		Urbanization.ECONOMY.depositPlayer(owner, funds);
 		Urbanization.CONTROLLER.getInstanceFile(ID).delete();
 	}
 	
@@ -80,7 +90,7 @@ public class Group {
 	
 	public double funds(){return funds;}
 	public void funds(double funds){this.funds=funds;}
-	public boolean hasFunds(double f){return funds>=f;}
+	public boolean hasFunds(double f){return !Urbanization.CONTROLLER.getGlobals().getBoolean("enable_economy") || funds>=f;}
 	public void deposit(double f){funds+=f;}
 	
 	public boolean groupExists(int rank){
@@ -95,11 +105,11 @@ public class Group {
 		for (Subgroup g : subgroups){
 			if (g.hasPlayer(player)) return g;
 		}
-		return subgroups[subgroupSize];
+		return null;
 	}
 	
 	public boolean hasPlayer(UUID player){
-		return getPlayerGroup(player)!=null && getPlayerGroup(player).ID!=subgroupSize;
+		return getPlayerGroup(player)!=null;
 	}
 	
 	public boolean playerHasPermission(UUID player, String perm){
@@ -115,6 +125,10 @@ public class Group {
 			if (t.x==x && t.z==z) return t;
 		}
 		return null;
+	}
+	
+	public void addTerritory(Territory t){
+		territory.add(t.toString());
 	}
 	
 	public boolean territoryBelongsToGroup(int x, int z){

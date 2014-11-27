@@ -13,10 +13,9 @@ public class GroupPermission {
 	}
 	
 	public boolean equals(GroupPermission p){
-		for (int i = 0; i<(Math.max(KEY.length, p.KEY.length)); i++){
-			if (i<KEY.length && i<p.KEY.length){
-				if (!KEY[i].equalsIgnoreCase(p.KEY[i]) && !(KEY[i].equals("*") || p.KEY[i].equals("*"))) return false;
-			}
+		int i = 0;
+		while (i<(Math.min(p.KEY.length, KEY.length))){
+			if (!p.KEY[i].equalsIgnoreCase(KEY[i]) && !(p.KEY[i].equals("*") || KEY[i].equals("*"))) return false;
 		}
 		return true;
 	}

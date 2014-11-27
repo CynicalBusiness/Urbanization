@@ -2,9 +2,46 @@ globals:
   enable_debug: false
   enable_economy: true
   
+
+  
   
 groups:
   name_pattern: "^[A-Za-z0-9]{4,16}$"
   
   econ_cost_create: 100.0
+  econ_cost_claim: 60.0
+  
+  block_containers:
+  - CHEST
+  - TRAPPED_CHEST
+  - FURNACE
+  - BURNING_FURANCE
+  - ANVIL
+  - BREWING_STAND
+  - HOPPER
+  - DROPPER
+  - DISPENSER
+  block_use:
+  - LEVER
+  - WOODEN_DOOR
+  - IRON_DOOR
+  - TRAP_DOOR
+  - DIODE_BLOCK_ON
+  - DIODE_BLOCK_OFF
+  - REDSTONE_COMPARATOR_ON
+  - REDSTONE_COMPARATOR_OFF
+  - WOOD_BUTTON
+  - STONE_BUTTON
+  - WOOD_PLATE
+  - STONE_PLATE
+  - GOLD_PLATE
+  - IRON_PLATE
+  - SOIL
+  - DIRT
+  block_right_click:
+  - INK_SACK
+  - FLINT_AND_STEEL
+  - ENDERPEARL
+  - EYE_OF_ENDER
+  block_left_click:
   

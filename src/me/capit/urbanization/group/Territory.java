@@ -38,7 +38,7 @@ public class Territory {
 	
 	public boolean playerCanUse(UUID player){
 		Group g = Urbanization.getGroupByID(gid);
-		return g.playerHasPermission(player, "build.use") && g.getPlayerGroup(player).ID>=sgid;
+		return g.playerHasPermission(player, "build.interact") && g.getPlayerGroup(player).ID>=sgid;
 	}
 	
 	public boolean playerCanAccessContainers(UUID player){
