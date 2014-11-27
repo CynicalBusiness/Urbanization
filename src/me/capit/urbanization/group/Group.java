@@ -139,6 +139,13 @@ public class Group {
 		}
 	}
 	
+	public void removeTerritory(int x, int z){
+		for (int i = 0; i<territory.size(); i++){
+			Territory t = Territory.fromString(territory.get(i));
+			if (t.x==x && t.z==z){ territory.remove(i); break; }
+		}
+	}
+	
 	public boolean territoryBelongsToGroup(int x, int z){
 		return getTerritoryAt(x,z)!=null;
 	}

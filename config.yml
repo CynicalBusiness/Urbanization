@@ -10,6 +10,7 @@ groups:
   
   econ_cost_create: 100.0
   econ_cost_claim: 60.0
+  econ_reward_unclaim: 40.0
   
   block_containers:
   - CHEST

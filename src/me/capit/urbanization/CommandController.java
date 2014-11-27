@@ -26,7 +26,7 @@ public class CommandController implements CommandExecutor, Listener{
 		SUCCESS, NO_RESPONSE, PLUGIN_ERROR,
 		
 		FAILED_PERMISSION, FAILED_FORMAT, FAILED_ARGUMENTS, FAILED_ARGUMENT_COUNT,
-		FAILED_GROUP_PERMISSION, FAILED_NOT_POSSIBLE, FAILED_EMPTY_PAGE,
+		FAILED_GROUP_PERMISSION, FAILED_NOT_POSSIBLE, FAILED_EMPTY_PAGE, FAILED_NOT_IN_TERRITORY,
 		FAILED_FUNDS, FAILED_GROUP_FUNDS, FAILED_NOT_IN_GROUP, FAILED_OTHER_GROUP;
 		
 		public String getMessage(){
@@ -55,6 +55,10 @@ public class CommandController implements CommandExecutor, Listener{
 				return "&c » Error: &rYou're not in a group!";
 			case FAILED_OTHER_GROUP:
 				return "&c » Error: &rA group does not permit you to do that there.";
+			case FAILED_NOT_IN_TERRITORY:
+				return "&c » Error: &rYou can only do that within your territory.";
+			case NO_RESPONSE:
+				return "";
 			default:
 				return "&f » The server did &cnot &rrespond.";
 			}
@@ -164,8 +168,7 @@ public class CommandController implements CommandExecutor, Listener{
 			new CommandInfo[]{
 					new CommandInfo("help [page=1]", "Displays [page] of the Urbanization help."),
 					new CommandInfo("create <name>", "Creates a new group by <name>."),
-					new CommandInfo("claim [rank="+Group.subgroupSize+"] [apothem=0]", "Claims the chunk(s) you're standing in, "
-							+ "optionally with [apothem] under [rank]."),
+					new CommandInfo("claim [rank="+Group.subgroupSize+"]", "Claims the chunk you're standing in, optionally for [rank]."),
 			},
 			new CommandInfo[]{
 					new CommandInfo("subgroup <group> addperm|takeperm <permission>", "Adds or takes <permission> from <group>."),
@@ -226,7 +229,6 @@ public class CommandController implements CommandExecutor, Listener{
 						return CResponse.FAILED_PERMISSION;
 					}
 				} else if (sc.equalsIgnoreCase("claim")){
-					Urbanization.LOGGER.fine(p.getName()+" issued 'claim' command.");
 					if (s.hasPermission("urbanization.kit.player") || s.hasPermission("urbanization.group.claim")){
 						Group g = Urbanization.getGroupByPlayer(p.getUniqueId());
 						if (g!=null){
@@ -258,6 +260,35 @@ public class CommandController implements CommandExecutor, Listener{
 					} else {
 						return CResponse.FAILED_PERMISSION;
 					}
+				} else if (sc.equalsIgnoreCase("unclaim")){
+					if (s.hasPermission("urbanization.kit.player") || s.hasPermission("urbanization.group.claim")){
+						Group g = Urbanization.getGroupByPlayer(p.getUniqueId());
+						Chunk chunk = p.getLocation().getChunk();
+						if (g!=null){
+							if (g.playerHasPermission(p.getUniqueId(), "territory.unclaim")){
+								if (g.territoryBelongsToGroup(chunk.getX(), chunk.getZ())){
+									g.removeTerritory(chunk.getX(), chunk.getZ());
+									if (Urbanization.CONTROLLER.getGlobals().getBoolean("enable_economy"))
+										g.funds(g.funds()+Urbanization.CONTROLLER.getGroupData().getDouble("econ_reward_unclaim"));
+									try {
+										g.save();
+									} catch (IOException e) {
+										// TODO Auto-generated catch block
+										e.printStackTrace();
+									}
+									return CResponse.SUCCESS;
+								} else {
+									return CResponse.FAILED_NOT_IN_TERRITORY;
+								}
+							} else {
+								return CResponse.FAILED_GROUP_PERMISSION;
+							}
+						} else {
+							return CResponse.FAILED_NOT_IN_GROUP;
+						}
+					} else {
+						return CResponse.FAILED_PERMISSION;
+					}
 				} else if (sc.equalsIgnoreCase("disband")){
 					if (s.hasPermission("urbanization.kit.player") || s.hasPermission("urbanization.group.disband")){
 						Group g = Urbanization.getGroupByPlayer(p.getUniqueId());
@@ -271,6 +302,12 @@ public class CommandController implements CommandExecutor, Listener{
 						} else {
 							return CResponse.FAILED_NOT_IN_GROUP;
 						}
+					} else {
+						return CResponse.FAILED_PERMISSION;
+					}
+				} else if (sc.equalsIgnoreCase("help")){
+					if (s.hasPermission("urbanization.kit.player") || s.hasPermission("urbanization.help")){
+						echoHelp(p);
 					} else {
 						return CResponse.FAILED_PERMISSION;
 					}
