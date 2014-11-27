@@ -4,7 +4,7 @@ public class GroupPermission {
 	public final String[] KEY;
 	
 	public GroupPermission(String permissionKey){
-		KEY = permissionKey.split(".");
+		KEY = permissionKey.split("\\.");
 	}
 	
 	@Override
@@ -16,14 +16,16 @@ public class GroupPermission {
 		int i = 0;
 		while (i<(Math.min(p.KEY.length, KEY.length))){
 			if (!p.KEY[i].equalsIgnoreCase(KEY[i]) && !(p.KEY[i].equals("*") || KEY[i].equals("*"))) return false;
+			i++;
 		}
 		return true;
 	}
 	
+	@Override
 	public String toString(){
 		String out = "";
-		for (String s : KEY){out+=s;}
-		return out;
+		for (String s : KEY){out+="."+s;}
+		return out.substring(1);
 	}
 	
 	

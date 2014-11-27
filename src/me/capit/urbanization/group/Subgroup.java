@@ -12,7 +12,7 @@ public class Subgroup {
 	private List<UUID> players = new ArrayList<UUID>();
 	
 	public static Subgroup buildFromConfig(ConfigurationSection c){
-		Subgroup s = new Subgroup(c.getString("NAME"),Integer.parseInt(c.getName()));
+		Subgroup s = new Subgroup(c.getString("NAME"),Integer.parseInt(c.getName().substring(2)));
 		List<String> u = c.getStringList("PLAYERS");
 		List<String> p = c.getStringList("PERMISSIONS");
 		for (String su : u){s.addPlayer(UUID.fromString(su));}
@@ -64,7 +64,7 @@ public class Subgroup {
 	}
 	
 	public void addToConfigEntry(ConfigurationSection c){
-		ConfigurationSection cs = c.contains(String.valueOf(ID)) ? c.createSection(String.valueOf(ID)) : c.getConfigurationSection(String.valueOf(ID));
+		ConfigurationSection cs = c.createSection("SG"+String.valueOf(ID));
 		List<String> p = new ArrayList<String>();
 		List<String> u = new ArrayList<String>();
 		for (GroupPermission gp : perms){p.add(gp.toString());}

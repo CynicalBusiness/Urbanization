@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import me.capit.urbanization.group.Group;
@@ -38,14 +37,22 @@ public class Urbanization extends JavaPlugin {
 		CONSOLE.sendMessage(ChatColor.WHITE+"---- "+ChatColor.AQUA+"Urbanization"+ChatColor.WHITE+" -------------------");
 		CONTROLLER.createEconomyProvider();
 		
-		LOGGER.setLevel(CONTROLLER.getGlobals().getBoolean("enable_debug") ? Level.FINE : Level.INFO);
+		//LOGGER.setLevel(CONTROLLER.getGlobals().getBoolean("enable_debug") ? Level.FINE : Level.INFO);
 		if (CONTROLLER.getGlobals().getBoolean("enable_debug")) 
 			CONSOLE.sendMessage(ChatColor.YELLOW+"Debug"+ChatColor.WHITE+" mode is "+ChatColor.BLUE+"enabled"+ChatColor.WHITE+".");
+		saveDefaultConfig();
 		
+		if (ECONOMY==null){
+			CONTROLLER.getGlobals().set("enable_economy", false);
+			CONSOLE.sendMessage(ChatColor.YELLOW+"Economy"+ChatColor.WHITE+" is "+ChatColor.RED+"disabled"+ChatColor.WHITE+", no economy plugin found.");
+		}
+		
+		File gFolder = new File(getDataFolder().getPath()+File.separator+"groups");
+		if (!gFolder.exists()) gFolder.mkdir();
 		CONSOLE.sendMessage(ChatColor.WHITE+"Loading groups...");
-		for (File gfile : getDataFolder().listFiles()){
+		for (File gfile : gFolder.listFiles()){
 			Group g = new Group(gfile.getName().replaceFirst("[.][^.]+$", ""));
-			CONSOLE.sendMessage(ChatColor.WHITE+"    INIT "+ChatColor.LIGHT_PURPLE+g.name());
+			CONSOLE.sendMessage(ChatColor.WHITE+"    INIT called for "+ChatColor.LIGHT_PURPLE+g.name());
 			groups.add(g);
 		}
 		
@@ -59,8 +66,9 @@ public class Urbanization extends JavaPlugin {
 	}
 	
 	public void onDisable(){
-		// TODO
+		CONSOLE.sendMessage(ChatColor.WHITE+"---- "+ChatColor.AQUA+"Urbanization"+ChatColor.WHITE+" -------------------");
 		
+		CONSOLE.sendMessage(ChatColor.WHITE+"Saving groups...");
 		for (Group g : groups){
 			try {
 				g.save();
@@ -69,6 +77,8 @@ public class Urbanization extends JavaPlugin {
 			}
 		}
 		
+		CONSOLE.sendMessage(ChatColor.WHITE+"Finished!");
+		CONSOLE.sendMessage(ChatColor.WHITE+"-------------------------------------");
 	}
 	
 	public boolean playerInGroup(UUID player){

@@ -29,7 +29,7 @@ public class Group {
 		YamlConfiguration file = Urbanization.CONTROLLER.readInstance(tid);
 		file.set("NAME", name); file.set("TAG", name.substring(0, 3).toUpperCase());
 		file.set("DESC", "Default Group Description"); file.set("MOTD", "");
-		file.set("FUNDS", 0); file.set("TERRITORY", new ArrayList<String>());
+		file.set("FUNDS", 0.0); file.set("TERRITORY", new ArrayList<String>());
 		
 		ConfigurationSection groups = file.createSection("GROUPS");
 		new Subgroup("Admin", 0).addPermission(new GroupPermission("*")).addPlayer(owner).addToConfigEntry(groups);
@@ -59,8 +59,10 @@ public class Group {
 		instance.set("TAG", tag); instance.set("MOTD", motd);
 		instance.set("FUNDS", funds); instance.set("TERRITORY", territory);
 		
-		instance.set("GROUPS", null); // Empty the groups value first.
-		for (Subgroup g : subgroups){g.addToConfigEntry(instance.getConfigurationSection("GROUPS"));}
+		ConfigurationSection groups = instance.createSection("GROUPS");
+		for (Subgroup sg : subgroups){if (sg!=null) sg.addToConfigEntry(groups);}
+		
+		instance.set("TERRITORY", territory);
 		
 		instance.save(Urbanization.CONTROLLER.getInstanceFile(ID));
 	}
@@ -69,10 +71,11 @@ public class Group {
 		OfflinePlayer owner = Bukkit.getServer().getPlayer(subgroups[0].getPlayers().get(0));
 		if (owner.isOnline()){
 			Player p = (Player) owner;
-			p.sendMessage(ChatColor.YELLOW+"The "+ChatColor.RED+funds+ChatColor.YELLOW+" "+
-					Urbanization.ECONOMY.currencyNamePlural()+" from the group back has been added to your account.");
+			if (Urbanization.ECONOMY!=null)
+				p.sendMessage(ChatColor.YELLOW+"The "+ChatColor.RED+funds+ChatColor.YELLOW+" "+
+						Urbanization.ECONOMY.currencyNamePlural()+" from the group back has been added to your account.");
 		}
-		Urbanization.ECONOMY.depositPlayer(owner, funds);
+		if (Urbanization.ECONOMY!=null) Urbanization.ECONOMY.depositPlayer(owner, funds);
 		Urbanization.CONTROLLER.getInstanceFile(ID).delete();
 	}
 	
@@ -103,7 +106,7 @@ public class Group {
 	
 	public Subgroup getPlayerGroup(UUID player){
 		for (Subgroup g : subgroups){
-			if (g.hasPlayer(player)) return g;
+			if (g!=null && g.hasPlayer(player)) return g;
 		}
 		return null;
 	}
@@ -116,7 +119,7 @@ public class Group {
 		return playerHasPermission(player, new GroupPermission(perm));
 	}
 	public boolean playerHasPermission(UUID player, GroupPermission perm){
-		return getPlayerGroup(player).hasPermission(perm);
+		return hasPlayer(player) ? getPlayerGroup(player).hasPermission(perm) : false;
 	}
 	
 	public Territory getTerritoryAt(int x, int z){
@@ -129,6 +132,11 @@ public class Group {
 	
 	public void addTerritory(Territory t){
 		territory.add(t.toString());
+		try {
+			save();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public boolean territoryBelongsToGroup(int x, int z){

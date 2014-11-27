@@ -9,7 +9,7 @@ public class Territory {
 	public final String gid;
 	
 	public static Territory fromString(String s){
-		String[] data = s.split("|");
+		String[] data = s.split("\\|");
 		if (data.length==4){
 			int x = Integer.parseInt(data[0]);
 			int z = Integer.parseInt(data[1]);
@@ -28,22 +28,22 @@ public class Territory {
 	
 	public boolean playerCanBreak(UUID player){
 		Group g = Urbanization.getGroupByID(gid);
-		return g.playerHasPermission(player, "build.break") && g.getPlayerGroup(player).ID>=sgid;
+		return g.playerHasPermission(player, "build.break") && g.getPlayerGroup(player).ID<=sgid;
 	}
 	
 	public boolean playerCanPlace(UUID player){
 		Group g = Urbanization.getGroupByID(gid);
-		return g.playerHasPermission(player, "build.place") && g.getPlayerGroup(player).ID>=sgid;
+		return g.playerHasPermission(player, "build.place") && g.getPlayerGroup(player).ID<=sgid;
 	}
 	
 	public boolean playerCanUse(UUID player){
 		Group g = Urbanization.getGroupByID(gid);
-		return g.playerHasPermission(player, "build.interact") && g.getPlayerGroup(player).ID>=sgid;
+		return g.playerHasPermission(player, "build.interact") && g.getPlayerGroup(player).ID<=sgid;
 	}
 	
 	public boolean playerCanAccessContainers(UUID player){
 		Group g = Urbanization.getGroupByID(gid);
-		return g.playerHasPermission(player, "build.container") && g.getPlayerGroup(player).ID>=sgid;
+		return g.playerHasPermission(player, "build.container") && g.getPlayerGroup(player).ID<=sgid;
 	}
 	
 	public String toString(){

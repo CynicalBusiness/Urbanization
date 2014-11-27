@@ -187,25 +187,26 @@ public class CommandController implements CommandExecutor, Listener{
 	}
 	
 	public CResponse executeCMD(CommandSender s, Command c, String l, String[] args){
-		if (l.equalsIgnoreCase("urbanization")){
+		if (c.getName().equalsIgnoreCase("urbanization")){
 			if (args.length>0){
 				String sc = args[0];
 				Player p = (Player) s;
 				if (sc.equalsIgnoreCase("create") && args.length==2){
 					if (s.hasPermission("urbanizations.kit.player") || s.hasPermission("urbanization.group.create")){
 						if (args[1].matches(Urbanization.CONTROLLER.getGroupData().getString("name_pattern"))){
-							if (Urbanization.getGroupByPlayer(p.getUniqueId())!=null){
+							if (Urbanization.getGroupByPlayer(p.getUniqueId())==null){
 								if (!Urbanization.CONTROLLER.getGlobals().getBoolean("enable_economy") 
 										|| Urbanization.ECONOMY.has((OfflinePlayer) s, Urbanization.CONTROLLER.getGroupData().getDouble("econ_cost_create"))){
 									String name = args[1];
 									if (name.matches(Urbanization.CONTROLLER.getGroupData().getString("name_pattern"))){
 										try {
-											Urbanization.ECONOMY.withdrawPlayer((OfflinePlayer) s, 
-													Urbanization.CONTROLLER.getGroupData().getDouble("econ_cost_create"));
+											if (Urbanization.CONTROLLER.getGlobals().getBoolean("enable_economy"))
+												Urbanization.ECONOMY.withdrawPlayer((OfflinePlayer) s, 
+														Urbanization.CONTROLLER.getGroupData().getDouble("econ_cost_create"));
 											Group g = Group.createNewGroup(name, ((Player) s).getUniqueId());
 											Urbanization.groups.add(g);
 											return CResponse.SUCCESS;
-										} catch (IOException e) {
+										} catch (IOException | NullPointerException e) {
 											e.printStackTrace();
 											return CResponse.PLUGIN_ERROR;
 										}
@@ -225,6 +226,7 @@ public class CommandController implements CommandExecutor, Listener{
 						return CResponse.FAILED_PERMISSION;
 					}
 				} else if (sc.equalsIgnoreCase("claim")){
+					Urbanization.LOGGER.fine(p.getName()+" issued 'claim' command.");
 					if (s.hasPermission("urbanization.kit.player") || s.hasPermission("urbanization.group.claim")){
 						Group g = Urbanization.getGroupByPlayer(p.getUniqueId());
 						if (g!=null){
@@ -233,11 +235,13 @@ public class CommandController implements CommandExecutor, Listener{
 										|| g.hasFunds(Urbanization.CONTROLLER.getGroupData().getDouble("econ_cost_claim"))){
 									Group atPos = Urbanization.getGroupByTerritory(p.getLocation().getChunk().getX(), p.getLocation().getChunk().getZ());
 									if (atPos==null){
-										int rank = args.length>=2 ? Integer.parseInt(args[1]) : 0;
+										int rank = args.length>=2 ? Integer.parseInt(args[1]) : Group.subgroupSize;
 										Territory t = new Territory(p.getLocation().getChunk().getX(), p.getLocation().getChunk().getZ(),g.ID,rank);
 										p.sendMessage(ChatColor.translateAlternateColorCodes('&', 
 												"&e » Registered new territory at &c"+t.x+"&e,&c"+t.z+"&e for &3"+g.name()+"&f:&c"+rank+"&e."));
 										g.addTerritory(t);
+										if (Urbanization.CONTROLLER.getGlobals().getBoolean("enable_economy"))
+											g.funds(g.funds()-Urbanization.CONTROLLER.getGroupData().getDouble("econ_cost_claim"));
 										return CResponse.SUCCESS;
 									} else {
 										return CResponse.FAILED_OTHER_GROUP;
