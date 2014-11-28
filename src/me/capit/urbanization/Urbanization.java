@@ -106,6 +106,17 @@ public class Urbanization extends JavaPlugin {
 		return null;
 	}
 	
+	public static Group getGroupByName(String name){
+		for (Group g : groups){
+			if (g.name().equalsIgnoreCase(name)) return g;
+		}
+		return null;
+	}
+	
+	public static boolean groupNameInUse(String name){
+		return getGroupByName(name)!=null;
+	}
+	
 	public static boolean territoryClaimed(int x, int z){
 		return getGroupByTerritory(x,z)!=null;
 	}
