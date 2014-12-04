@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.UUID;
 import java.util.logging.Logger;
 
+import me.capit.urbanization.command.*;
+import me.capit.urbanization.command.UrbanizationCommandParser.UrbanizationCommands;
 import me.capit.urbanization.group.Group;
 import me.capit.urbanization.group.Subgroup;
 import me.capit.urbanization.group.Territory;
@@ -38,6 +40,8 @@ public class Urbanization extends JavaPlugin {
 		ConfigurationSerialization.registerClass(Territory.class);
 		ConfigurationSerialization.registerClass(Subgroup.class);
 		ConfigurationSerialization.registerClass(SerialLocation.class);
+		
+		UrbanizationCommands.registerCommandParser("create", CMDCreate.class);
 	}
 	
 	public void onEnable(){
