@@ -2,24 +2,37 @@ package me.capit.urbanization.group;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.UUID;
 
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.serialization.ConfigurationSerializable;
 
-public class Subgroup {
-	private String name; public final int ID; private char prefix;
+public class Subgroup implements ConfigurationSerializable {
+	private String name; public final int ID; private char prefix = ' ';
 	private List<GroupPermission> perms = new ArrayList<GroupPermission>();
 	private List<UUID> players = new ArrayList<UUID>();
 	
-	public static Subgroup buildFromConfig(ConfigurationSection c){
-		Subgroup s = new Subgroup(c.getString("NAME"),Integer.parseInt(c.getName().substring(2)));
-		char pr = (char) c.getInt("PREFIX");
-		List<String> u = c.getStringList("PLAYERS");
-		List<String> p = c.getStringList("PERMISSIONS");
-		for (String su : u){s.addPlayer(UUID.fromString(su));}
-		for (String sp : p){s.addPermission(new GroupPermission(sp));}
-		s.setPrefix(pr);
-		return s;
+	public Subgroup(Map<String, Object> map){
+		name = (String) map.get("NAME");
+		ID = (int) map.get("ID");
+		prefix = ((String) map.get("PREFIX")).charAt(0);
+		for (Object o : (List<?>) map.get("PLAYERS")) players.add(UUID.fromString((String) o));
+		for (Object o : (List<?>) map.get("PERMISSIONS")) perms.add(new GroupPermission((String) o));
+	}
+	
+	@Override
+	public Map<String, Object> serialize(){
+		Map<String, Object> map = new TreeMap<String, Object>();
+		map.put("PREFIX", String.valueOf(prefix));
+		map.put("ID", ID); map.put("NAME", name);
+		List<String> u = new ArrayList<String>();
+		List<String> p = new ArrayList<String>();
+		for (GroupPermission perm : perms) p.add(perm.toString());
+		for (UUID player : players) u.add(player.toString());
+		map.put("PLAYERS", u); map.put("PERMISSIONS", p);
+		return map;
 	}
 	
 	public Subgroup(String name, int ID){

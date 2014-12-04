@@ -9,6 +9,7 @@ import java.util.UUID;
 import java.util.logging.Logger;
 
 import me.capit.urbanization.group.Group;
+import me.capit.urbanization.group.Subgroup;
 import me.capit.urbanization.group.Territory;
 import net.milkbowl.vault.chat.Chat;
 import net.milkbowl.vault.economy.Economy;
@@ -16,18 +17,28 @@ import net.milkbowl.vault.permission.Permission;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.ConsoleCommandSender;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class Urbanization extends JavaPlugin {
 	public static ConsoleCommandSender CONSOLE;
 	public static Logger LOGGER;
-	public static Permission PERMISSION;
+	public static Permission PERMISSION; public static boolean AEIGS_ENABLED = false;
 	public static Economy ECONOMY; public static Chat CHAT;
 	public static DataController CONTROLLER;
 	public static CommandController COMMANDS;
 	public static List<Group> groups = new ArrayList<Group>();
 	public static HashMap<UUID, String> trackedPlayers = new HashMap<UUID, String>();
+	public static HashMap<UUID, UUID> invites = new HashMap<UUID, UUID>();
 	
+	static {
+		ConfigurationSerialization.registerClass(Group.class);
+		ConfigurationSerialization.registerClass(Territory.class);
+		ConfigurationSerialization.registerClass(Subgroup.class);
+		ConfigurationSerialization.registerClass(SerialLocation.class);
+	}
 	
 	public void onEnable(){
 		CONSOLE = getServer().getConsoleSender();
@@ -51,7 +62,8 @@ public class Urbanization extends JavaPlugin {
 		if (!gFolder.exists()) gFolder.mkdir();
 		CONSOLE.sendMessage(ChatColor.WHITE+"Loading groups...");
 		for (File gfile : gFolder.listFiles()){
-			Group g = new Group(gfile.getName().replaceFirst("[.][^.]+$", ""));
+			FileConfiguration c = YamlConfiguration.loadConfiguration(gfile);
+			Group g = (Group) c.get("DATA");
 			CONSOLE.sendMessage(ChatColor.WHITE+"    INIT called for "+ChatColor.LIGHT_PURPLE+g.name());
 			groups.add(g);
 		}
@@ -92,7 +104,7 @@ public class Urbanization extends JavaPlugin {
 		return null;
 	}
 	
-	public static Group getGroupByID(String ID){
+	public static Group getGroupByID(UUID ID){
 		for (Group g : groups){
 			if (g.ID.equals(ID)) return g;
 		}
@@ -121,7 +133,7 @@ public class Urbanization extends JavaPlugin {
 		return getGroupByTerritory(x,z)!=null;
 	}
 	
-	public static void deleteGroupByID(String ID){
+	public static void deleteGroupByID(UUID ID){
 		for (int i=0; i<groups.size(); i++){
 			Group g = groups.get(i);
 			if (g.ID.equals(ID)){

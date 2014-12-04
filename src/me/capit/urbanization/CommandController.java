@@ -1,7 +1,7 @@
 package me.capit.urbanization;
 
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 import me.capit.urbanization.group.Group;
@@ -33,44 +33,48 @@ public class CommandController implements CommandExecutor, Listener{
 		FAILED_PERMISSION, FAILED_FORMAT, FAILED_ARGUMENTS, FAILED_ARGUMENT_COUNT,
 		FAILED_GROUP_PERMISSION, FAILED_NOT_POSSIBLE, FAILED_EMPTY_PAGE, FAILED_NOT_IN_TERRITORY,
 		FAILED_FUNDS, FAILED_GROUP_FUNDS, FAILED_NOT_IN_GROUP, FAILED_OTHER_GROUP,
-		FAILED_IN_USE, FAILED_UNKNOWN_GROUP;
+		FAILED_IN_USE, FAILED_UNKNOWN_GROUP, FAILED_PLAYER_NOT_FOUND, FAILED_IN_GROUP;
 		
 		public String getMessage(){
 			switch (this){
 			case SUCCESS:
-				return "&f » Operation &aSucceeded&f!";
+				return "&f Â» Operation &aSucceeded&f!";
 			case FAILED_PERMISSION:
-				return "&c » Error: &rThe &oserver &rdoes not permit you to do that!";
+				return "&c Â» Error: &rThe &oserver &rdoes not permit you to do that!";
 			case FAILED_FORMAT:
-				return "&c » Error: &rThe specified &3format &rwas invalid.";
+				return "&c Â» Error: &rThe specified &3format &rwas invalid.";
 			case FAILED_ARGUMENTS:
-				return "&c » Error: &rInvalid or unknown &eargument &rspecified.";
+				return "&c Â» Error: &rInvalid or unknown &eargument &rspecified.";
 			case FAILED_ARGUMENT_COUNT:
-				return "&c » Error: &rIncorrect &eargument &rcount.";
+				return "&c Â» Error: &rIncorrect &eargument &rcount.";
 			case FAILED_GROUP_PERMISSION:
-				return "&c » Error: &rYour &dgroup &rdoes not permit you to do that!";
+				return "&c Â» Error: &rYour &dgroup &rdoes not permit you to do that!";
 			case FAILED_NOT_POSSIBLE:
-				return "&c » Error: &rYou can't do &othat&r!";
+				return "&c Â» Error: &rYou can't do &othat&r!";
 			case FAILED_EMPTY_PAGE:
-				return "&c » Error: &rThat &opage &ris empty!";
+				return "&c Â» Error: &rThat &opage &ris empty!";
 			case FAILED_FUNDS:
-				return "&c » Error: &rYou do not have enough &o"+Urbanization.ECONOMY.currencyNamePlural()+"&r!";
+				return "&c Â» Error: &rYou do not have enough &o"+Urbanization.ECONOMY.currencyNamePlural()+"&r!";
 			case FAILED_GROUP_FUNDS:
-				return "&c » Error: &rYour group does not have enough &o"+Urbanization.ECONOMY.currencyNamePlural()+"&r!";
+				return "&c Â» Error: &rYour group does not have enough &o"+Urbanization.ECONOMY.currencyNamePlural()+"&r!";
 			case FAILED_NOT_IN_GROUP:
-				return "&c » Error: &rYou're not in a group!";
+				return "&c Â» Error: &rYou're not in a group!";
 			case FAILED_OTHER_GROUP:
-				return "&c » Error: &rA group does not permit you to do that there.";
+				return "&c Â» Error: &rA group does not permit you to do that there.";
 			case FAILED_NOT_IN_TERRITORY:
-				return "&c » Error: &rYou can only do that within your territory.";
+				return "&c Â» Error: &rYou can only do that within your territory.";
 			case FAILED_IN_USE:
-				return "&c » Error: &rThat is already in use by another group.";
+				return "&c Â» Error: &rThat is already in use by another group.";
 			case FAILED_UNKNOWN_GROUP:
-				return "&c » Error: &rNo group by that name exists.";
+				return "&c Â» Error: &rNo group by that name exists.";
+			case FAILED_PLAYER_NOT_FOUND:
+				return "&c Â» Error: &rThat player was not found.";
+			case FAILED_IN_GROUP:
+				return "&c Â» Error: &rYou cannot do that while in a group.";
 			case NO_RESPONSE:
 				return "";
 			default:
-				return "&f » The server did &cnot &rrespond.";
+				return "&f Â» The server did &cnot &rrespond.";
 			}
 		}
 	}
@@ -130,7 +134,8 @@ public class CommandController implements CommandExecutor, Listener{
 						e.setCancelled(true);
 					}
 				} else if (Urbanization.CONTROLLER.getGroupData().getStringList("block_interact").contains(e.getClickedBlock().getType().toString()) || 
-						Urbanization.CONTROLLER.getGroupData().getStringList("block_right_click").contains(e.getPlayer().getItemInHand().getType().toString())) {
+						Urbanization.CONTROLLER.getGroupData().getStringList("block_right_click").contains(
+								e.getPlayer().getItemInHand().getType().toString())) {
 					if (!t.playerCanUse(e.getPlayer().getUniqueId())){
 						e.getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', CResponse.FAILED_OTHER_GROUP.getMessage()));
 						e.setCancelled(true);
@@ -149,7 +154,8 @@ public class CommandController implements CommandExecutor, Listener{
 				Chunk c = e.getPlayer().getLocation().getChunk();
 				Territory t = Urbanization.getTerritory(c.getX(), c.getZ());
 				if (Urbanization.CONTROLLER.getGroupData().getStringList("block_interact").contains(e.getClickedBlock().getType().toString()) || 
-						Urbanization.CONTROLLER.getGroupData().getStringList("block_left_click").contains(e.getPlayer().getItemInHand().getType().toString())){
+						Urbanization.CONTROLLER.getGroupData().getStringList("block_left_click").contains(
+								e.getPlayer().getItemInHand().getType().toString())){
 					if (!t.playerCanUse(e.getPlayer().getUniqueId())){
 						e.getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', CResponse.FAILED_OTHER_GROUP.getMessage()));
 						e.setCancelled(true);
@@ -165,11 +171,11 @@ public class CommandController implements CommandExecutor, Listener{
 	public void onPlayerMove(PlayerMoveEvent e){
 		Chunk c = e.getPlayer().getLocation().getChunk();
 		Group g = Urbanization.getGroupByTerritory(c.getX(), c.getZ());
-		String ID = g!=null ? g.ID : "undefined";
+		String ID = g!=null ? g.ID.toString() : "undefined";
 		if (!Urbanization.trackedPlayers.containsKey(e.getPlayer().getUniqueId())
 				|| !Urbanization.trackedPlayers.get(e.getPlayer().getUniqueId()).equals(ID)){
 			e.getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', 
-					g!=null ? "&e » &f"+g.name()+" &7- &r"+g.desc() : "&e » &oUnclaimed territory."));
+					g!=null ? "&e â™¦ &f"+g.name()+" &7- &r"+g.desc() : "&e â™¦ &oUnclaimed territory."));
 			Urbanization.trackedPlayers.put(e.getPlayer().getUniqueId(), ID);
 		}
 	}
@@ -210,7 +216,8 @@ public class CommandController implements CommandExecutor, Listener{
 							if (args[1].matches(Urbanization.CONTROLLER.getGroupData().getString("name_pattern"))){
 								if (Urbanization.getGroupByPlayer(p.getUniqueId())==null){
 									if (!Urbanization.CONTROLLER.getGlobals().getBoolean("enable_economy") 
-											|| Urbanization.ECONOMY.has((OfflinePlayer) s, Urbanization.CONTROLLER.getGroupData().getDouble("econ_cost_create"))){
+											|| Urbanization.ECONOMY.has((OfflinePlayer) s, Urbanization.CONTROLLER.getGroupData().
+													getDouble("econ_cost_create"))){
 										String name = args[1];
 										if (name.matches(Urbanization.CONTROLLER.getGroupData().getString("name_pattern"))){
 											try {
@@ -251,9 +258,10 @@ public class CommandController implements CommandExecutor, Listener{
 									Group atPos = Urbanization.getGroupByTerritory(p.getLocation().getChunk().getX(), p.getLocation().getChunk().getZ());
 									if (atPos==null){
 										int rank = args.length>=2 ? Integer.parseInt(args[1]) : Group.subgroupSize;
-										Territory t = new Territory(p.getLocation().getChunk().getX(), p.getLocation().getChunk().getZ(),g.ID,rank);
+										Territory t = new Territory(p.getLocation().getChunk().getX(), p.getLocation().getChunk().getZ(),g.ID,
+												rank, p.getLocation().getWorld().getName());
 										p.sendMessage(ChatColor.translateAlternateColorCodes('&', 
-												"&e » Registered new territory at &c"+t.x+"&e,&c"+t.z+"&e for &3"+g.name()+"&f:&c"+rank+"&e."));
+												"&e Â» Registered new territory at &c"+t.x+"&e,&c"+t.z+"&e for &3"+g.name()+"&f:&c"+rank+"&e."));
 										g.addTerritory(t);
 										if (Urbanization.CONTROLLER.getGlobals().getBoolean("enable_economy"))
 											g.funds(g.funds()-Urbanization.CONTROLLER.getGroupData().getDouble("econ_cost_claim"));
@@ -413,9 +421,10 @@ public class CommandController implements CommandExecutor, Listener{
 								playersTotal+=", "+g.getPlayerPrefix(id)+op.getName();
 								if (op.isOnline()) playersOnline+=", "+g.getPlayerPrefix(id)+op.getName();
 							}
-							HashMap<String, GroupRelation> rels = g.getRelatedGroups();
+							Map<String, GroupRelation> rels = g.getRelatedGroups();
 							for (String id : rels.keySet()){
-								relations+=ChatColor.WHITE+", "+Urbanization.getGroupByID(id).name()+":"+rels.get(id).getColor()+rels.get(id).toString();
+								relations+=ChatColor.WHITE+", "+Urbanization.getGroupByID(UUID.fromString(id)).name()+":"
+										+rels.get(id).getColor()+rels.get(id).toString();
 							}
 							s.sendMessage(ChatColor.translateAlternateColorCodes('&', 
 									"&e------ &7Group &3"+g.name()+" &f(&7"+g.tag()+"&f) &e--------------------------"));
@@ -442,7 +451,7 @@ public class CommandController implements CommandExecutor, Listener{
 							if (g.playerCanTele(p.getUniqueId())){
 								if (g.getHome()!=null){
 									p.teleport(g.getHome());
-									p.sendMessage(ChatColor.GRAY+"» "+g.motd());
+									p.sendMessage(ChatColor.YELLOW+" â™¦ "+ChatColor.GRAY+g.motd());
 									return CResponse.NO_RESPONSE;
 								} else {
 									return CResponse.FAILED_NOT_POSSIBLE;
@@ -470,6 +479,83 @@ public class CommandController implements CommandExecutor, Listener{
 								}
 							} else {
 								return CResponse.FAILED_NOT_IN_TERRITORY;
+							}
+						} else {
+							return CResponse.FAILED_NOT_IN_GROUP;
+						}
+					} else {
+						return CResponse.FAILED_PERMISSION;
+					}
+				} else if (sc.equalsIgnoreCase("invite")){
+					if (args.length==2){
+						if (s.hasPermission("urbanization.kit.player") || s.hasPermission("urbanization.group.invite")){
+							Group g = Urbanization.getGroupByPlayer(p.getUniqueId());
+							if (g!=null){
+								if (g.playerHasPermission(p.getUniqueId(), "group.invite")){
+									@SuppressWarnings("deprecation")
+									OfflinePlayer targ = Bukkit.getOfflinePlayer(args[1]);
+									if (targ!=null){
+										if (!Urbanization.invites.containsKey(p.getUniqueId()) || 
+												!Urbanization.invites.get(p.getUniqueId()).equals(g.ID)){
+											Urbanization.invites.put(targ.getUniqueId(), g.ID);
+											p.sendMessage(ChatColor.YELLOW+" â™¦ "+ChatColor.GRAY+" Invite sent to "
+													+ChatColor.AQUA+targ.getName()+ChatColor.GRAY+".");
+										} else {
+											Urbanization.invites.remove(targ.getUniqueId());
+											p.sendMessage(ChatColor.YELLOW+" â™¦ "+ChatColor.GRAY+" Invite revoked from "
+													+ChatColor.AQUA+targ.getName()+ChatColor.GRAY+".");
+										}
+										return CResponse.NO_RESPONSE;
+									} else {
+										return CResponse.FAILED_PLAYER_NOT_FOUND;
+									}
+								} else {
+									return CResponse.FAILED_GROUP_PERMISSION;
+								}
+							} else {
+								return CResponse.FAILED_NOT_IN_GROUP;
+							}
+						} else {
+							return CResponse.FAILED_PERMISSION;
+						}
+					} else {
+						return CResponse.FAILED_ARGUMENT_COUNT;
+					}
+				} else if (sc.equalsIgnoreCase("join")){
+					if (args.length==2){
+						if (s.hasPermission("urbanization.kit.player") || s.hasPermission("urbanization.group.join")){
+							if (Urbanization.getGroupByPlayer(p.getUniqueId())==null){
+								Group targ = Urbanization.getGroupByName(args[2]);
+								if (targ!=null){
+									if (Urbanization.invites.containsKey(p.getUniqueId())){
+										Urbanization.invites.remove(p.getUniqueId());
+										targ.addPlayer(p.getUniqueId());
+										p.sendMessage(ChatColor.YELLOW+" â™¦ "+ChatColor.GRAY+" Successfully joined "
+												+ChatColor.AQUA+targ.name()+ChatColor.GRAY+".");
+										return CResponse.NO_RESPONSE;
+									} else {
+										return CResponse.FAILED_OTHER_GROUP;
+									}
+								} else {
+									return CResponse.FAILED_UNKNOWN_GROUP;
+								}
+							} else {
+								return CResponse.FAILED_IN_GROUP;
+							}
+						} else {
+							return CResponse.FAILED_PERMISSION;
+						}
+					} else {
+						return CResponse.FAILED_ARGUMENT_COUNT;
+					}
+				} else if (sc.equalsIgnoreCase("leave")){
+					if (s.hasPermission("urbanization.kit.player") || s.hasPermission("urbanization.group.leave")){
+						Group g = Urbanization.getGroupByPlayer(p.getUniqueId());
+						if (g!=null){
+							if (!g.getGroup(0).getPlayers().get(0).equals(p.getUniqueId())){
+								g.removePlayer(p.getUniqueId());
+							} else {
+								return CResponse.FAILED_NOT_POSSIBLE;
 							}
 						} else {
 							return CResponse.FAILED_NOT_IN_GROUP;

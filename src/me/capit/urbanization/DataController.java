@@ -2,9 +2,11 @@ package me.capit.urbanization;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.UUID;
 
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.plugin.RegisteredServiceProvider;
 
 import net.milkbowl.vault.chat.Chat;
@@ -52,8 +54,8 @@ public class DataController {
 		return plugin.getConfig().getConfigurationSection("groups");
 	}
 	
-	public File getInstanceFile(String instanceID){
-		File f = new File(plugin.getDataFolder().getPath()+File.separator+"groups"+File.separator+instanceID+".yml");
+	public File getInstanceFile(UUID instanceID){
+		File f = new File(plugin.getDataFolder().getPath()+File.separator+"groups"+File.separator+instanceID.toString()+".yml");
 		if (!f.exists()){
 			try {
 				f.createNewFile();
@@ -69,13 +71,13 @@ public class DataController {
 		return YamlConfiguration.loadConfiguration(instance);
 	}
 	
-	public YamlConfiguration readInstance(String instanceID){
+	public YamlConfiguration readInstance(UUID instanceID){
 		return readInstance(getInstanceFile(instanceID));
 	}
 	
-	public void writeInstance(String instanceID, String key, Object value) throws IOException{
+	public void writeInstance(UUID instanceID, ConfigurationSerializable instance) throws IOException{
 		YamlConfiguration c = readInstance(instanceID);
-		c.set(key, value);
+		c.set("DATA", instance);
 		c.save(getInstanceFile(instanceID));
 	}
 	
