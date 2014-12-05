@@ -216,135 +216,11 @@ public class CommandController implements CommandExecutor, Listener{
 				} else if (sc.equalsIgnoreCase("claim")){
 					
 				} else if (sc.equalsIgnoreCase("unclaim")){
-					if (s.hasPermission("urbanization.kit.player") || s.hasPermission("urbanization.group.claim")){
-						Group g = Urbanization.getGroupByPlayer(p.getUniqueId());
-						Chunk chunk = p.getLocation().getChunk();
-						if (g!=null){
-							if (g.playerHasPermission(p.getUniqueId(), "territory.unclaim")){
-								if (g.territoryBelongsToGroup(chunk.getX(), chunk.getZ())){
-									g.removeTerritory(chunk.getX(), chunk.getZ());
-									if (Urbanization.CONTROLLER.getGlobals().getBoolean("enable_economy"))
-										g.funds(g.funds()+Urbanization.CONTROLLER.getGroupData().getDouble("econ_reward_unclaim"));
-									try {
-										g.save();
-									} catch (IOException e) {
-										e.printStackTrace();
-									}
-									return CResponse.SUCCESS;
-								} else {
-									return CResponse.FAILED_NOT_IN_TERRITORY;
-								}
-							} else {
-								return CResponse.FAILED_GROUP_PERMISSION;
-							}
-						} else {
-							return CResponse.FAILED_NOT_IN_GROUP;
-						}
-					} else {
-						return CResponse.FAILED_PERMISSION;
-					}
+					
 				} else if (sc.equalsIgnoreCase("disband")){
-					if (s.hasPermission("urbanization.kit.player") || s.hasPermission("urbanization.group.disband")){
-						Group g = Urbanization.getGroupByPlayer(p.getUniqueId());
-						if (g!=null){
-							if (g.playerHasPermission(p.getUniqueId(), "group.disband")){
-								Urbanization.deleteGroupByID(g.ID);
-								return CResponse.SUCCESS;
-							} else {
-								return CResponse.FAILED_GROUP_PERMISSION;
-							}
-						} else {
-							return CResponse.FAILED_NOT_IN_GROUP;
-						}
-					} else {
-						return CResponse.FAILED_PERMISSION;
-					}
+					
 				} else if (sc.equalsIgnoreCase("modify")){
-					if (args.length>=3){
-						if (s.hasPermission("urbanization.kit.player") || s.hasPermission("urbanization.group.modify")){
-							String ssc = args[1];
-							Group g = Urbanization.getGroupByPlayer(p.getUniqueId());
-							if (g!=null){
-								if (ssc.equalsIgnoreCase("name")){
-									if (!Urbanization.groupNameInUse(args[2])){
-										if (args[2].matches(Urbanization.CONTROLLER.getGroupData().getString("name_pattern"))){
-											if (g.playerHasPermission(p.getUniqueId(), "group.modify.name")){
-												if (g.hasFunds(Urbanization.CONTROLLER.getGroupData().getDouble("econ_cost_name"))){
-													g.name(args[2]);
-													if (Urbanization.CONTROLLER.getGlobals().getBoolean("enable_economy"))
-														g.funds(g.funds()-Urbanization.CONTROLLER.getGroupData().getDouble("econ_cost_name"));
-													return CResponse.SUCCESS;
-												} else {
-													return CResponse.FAILED_GROUP_FUNDS;
-												}
-											} else {
-												return CResponse.FAILED_GROUP_PERMISSION;
-											}
-										} else {
-											return CResponse.FAILED_FORMAT;
-										} 
-									} else {
-										return CResponse.FAILED_IN_USE;
-									}
-								} else if (ssc.equalsIgnoreCase("tag")){
-									if (args[2].matches(Urbanization.CONTROLLER.getGroupData().getString("tag_pattern"))){
-										if (g.playerHasPermission(p.getUniqueId(), "group.modify.tag")){
-											if (g.hasFunds(Urbanization.CONTROLLER.getGroupData().getDouble("econ_cost_tag"))){
-												g.tag(args[2]);
-												if (Urbanization.CONTROLLER.getGlobals().getBoolean("enable_economy"))
-													g.funds(g.funds()-Urbanization.CONTROLLER.getGroupData().getDouble("econ_cost_tag"));
-												return CResponse.SUCCESS;
-											} else {
-												return CResponse.FAILED_GROUP_FUNDS;
-											}
-										} else {
-											return CResponse.FAILED_GROUP_PERMISSION;
-										}
-									} else {
-										return CResponse.FAILED_FORMAT;
-									}
-								} else if (ssc.equalsIgnoreCase("desc")){
-									if (g.playerHasPermission(p.getUniqueId(), "group.modify.desc")){
-										if (g.hasFunds(Urbanization.CONTROLLER.getGroupData().getDouble("econ_cost_desc"))){
-											String desc = "";
-											for (int i=2; i<args.length; i++){desc+=" "+args[i];}
-											g.desc(desc.substring(1));
-											if (Urbanization.CONTROLLER.getGlobals().getBoolean("enable_economy"))
-												g.funds(g.funds()-Urbanization.CONTROLLER.getGroupData().getDouble("econ_cost_desc"));
-											return CResponse.SUCCESS;
-										} else {
-											return CResponse.FAILED_GROUP_FUNDS;
-										}
-									} else {
-										return CResponse.FAILED_GROUP_PERMISSION;
-									}
-								} else if (ssc.equalsIgnoreCase("motd")){
-									if (g.playerHasPermission(p.getUniqueId(), "group.modify.motd")){
-										if (g.hasFunds(Urbanization.CONTROLLER.getGroupData().getDouble("econ_cost_motd"))){
-											String motd = "";
-											for (int i=2; i<args.length; i++){motd+=" "+args[i];}
-											g.motd(motd.substring(1));
-											if (Urbanization.CONTROLLER.getGlobals().getBoolean("enable_economy"))
-												g.funds(g.funds()-Urbanization.CONTROLLER.getGroupData().getDouble("econ_cost_motd"));
-											return CResponse.SUCCESS;
-										} else {
-											return CResponse.FAILED_GROUP_FUNDS;
-										}
-									} else {
-										return CResponse.FAILED_GROUP_PERMISSION;
-									}
-								} else {
-									return CResponse.FAILED_ARGUMENTS;
-								}
-							} else {
-								return CResponse.FAILED_NOT_IN_GROUP;
-							}
-						} else {
-							return CResponse.FAILED_PERMISSION;
-						}
-					} else {
-						return CResponse.FAILED_ARGUMENT_COUNT;
-					}
+					
 				} else if (sc.equalsIgnoreCase("info")){
 					if (s.hasPermission("urbanization.kit.player") || s.hasPermission("urbanization.group.info")){
 						Group g = args.length>1 ? Urbanization.getGroupByName(args[1]) : Urbanization.getGroupByPlayer(p.getUniqueId());
@@ -400,88 +276,11 @@ public class CommandController implements CommandExecutor, Listener{
 						return CResponse.FAILED_PERMISSION;
 					}
 				} else if (sc.equalsIgnoreCase("sethome")){
-					if (s.hasPermission("urbanization.kit.player") || s.hasPermission("urbanization.group.sethome")){
-						Group g = Urbanization.getGroupByPlayer(p.getUniqueId());
-						if (g!=null){
-							Location targ = p.getLocation();
-							if (g.territoryBelongsToGroup(targ.getChunk().getX(), targ.getChunk().getZ())){
-								if (g.playerHasPermission(p.getUniqueId(), "group.sethome")){
-									g.setHome(targ);
-									return CResponse.SUCCESS;
-								} else {
-									return CResponse.FAILED_GROUP_PERMISSION;
-								}
-							} else {
-								return CResponse.FAILED_NOT_IN_TERRITORY;
-							}
-						} else {
-							return CResponse.FAILED_NOT_IN_GROUP;
-						}
-					} else {
-						return CResponse.FAILED_PERMISSION;
-					}
+					
 				} else if (sc.equalsIgnoreCase("invite")){
-					if (args.length==2){
-						if (s.hasPermission("urbanization.kit.player") || s.hasPermission("urbanization.group.invite")){
-							Group g = Urbanization.getGroupByPlayer(p.getUniqueId());
-							if (g!=null){
-								if (g.playerHasPermission(p.getUniqueId(), "group.invite")){
-									@SuppressWarnings("deprecation")
-									OfflinePlayer targ = Bukkit.getOfflinePlayer(args[1]);
-									if (targ!=null){
-										if (!Urbanization.invites.containsKey(p.getUniqueId()) || 
-												!Urbanization.invites.get(p.getUniqueId()).equals(g.ID)){
-											Urbanization.invites.put(targ.getUniqueId(), g.ID);
-											p.sendMessage(ChatColor.YELLOW+" ♦ "+ChatColor.GRAY+" Invite sent to "
-													+ChatColor.AQUA+targ.getName()+ChatColor.GRAY+".");
-										} else {
-											Urbanization.invites.remove(targ.getUniqueId());
-											p.sendMessage(ChatColor.YELLOW+" ♦ "+ChatColor.GRAY+" Invite revoked from "
-													+ChatColor.AQUA+targ.getName()+ChatColor.GRAY+".");
-										}
-										return CResponse.NO_RESPONSE;
-									} else {
-										return CResponse.FAILED_PLAYER_NOT_FOUND;
-									}
-								} else {
-									return CResponse.FAILED_GROUP_PERMISSION;
-								}
-							} else {
-								return CResponse.FAILED_NOT_IN_GROUP;
-							}
-						} else {
-							return CResponse.FAILED_PERMISSION;
-						}
-					} else {
-						return CResponse.FAILED_ARGUMENT_COUNT;
-					}
+					
 				} else if (sc.equalsIgnoreCase("join")){
-					if (args.length==2){
-						if (s.hasPermission("urbanization.kit.player") || s.hasPermission("urbanization.group.join")){
-							if (Urbanization.getGroupByPlayer(p.getUniqueId())==null){
-								Group targ = Urbanization.getGroupByName(args[2]);
-								if (targ!=null){
-									if (Urbanization.invites.containsKey(p.getUniqueId())){
-										Urbanization.invites.remove(p.getUniqueId());
-										targ.addPlayer(p.getUniqueId());
-										p.sendMessage(ChatColor.YELLOW+" ♦ "+ChatColor.GRAY+" Successfully joined "
-												+ChatColor.AQUA+targ.name()+ChatColor.GRAY+".");
-										return CResponse.NO_RESPONSE;
-									} else {
-										return CResponse.FAILED_OTHER_GROUP;
-									}
-								} else {
-									return CResponse.FAILED_UNKNOWN_GROUP;
-								}
-							} else {
-								return CResponse.FAILED_IN_GROUP;
-							}
-						} else {
-							return CResponse.FAILED_PERMISSION;
-						}
-					} else {
-						return CResponse.FAILED_ARGUMENT_COUNT;
-					}
+					
 				} else if (sc.equalsIgnoreCase("leave")){
 					if (s.hasPermission("urbanization.kit.player") || s.hasPermission("urbanization.group.leave")){
 						Group g = Urbanization.getGroupByPlayer(p.getUniqueId());
