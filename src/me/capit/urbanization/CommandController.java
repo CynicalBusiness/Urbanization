@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.UUID;
 
+import me.capit.urbanization.command.UrbanizationCommandParser.UrbanizationCommands;
 import me.capit.urbanization.group.Group;
 import me.capit.urbanization.group.GroupRelation;
 import me.capit.urbanization.group.Territory;
@@ -211,76 +212,9 @@ public class CommandController implements CommandExecutor, Listener{
 				String sc = args[0];
 				Player p = (Player) s;
 				if (sc.equalsIgnoreCase("create") && args.length==2){
-					if (s.hasPermission("urbanizations.kit.player") || s.hasPermission("urbanization.group.create")){
-						if (!Urbanization.groupNameInUse(args[1])){
-							if (args[1].matches(Urbanization.CONTROLLER.getGroupData().getString("name_pattern"))){
-								if (Urbanization.getGroupByPlayer(p.getUniqueId())==null){
-									if (!Urbanization.CONTROLLER.getGlobals().getBoolean("enable_economy") 
-											|| Urbanization.ECONOMY.has((OfflinePlayer) s, Urbanization.CONTROLLER.getGroupData().
-													getDouble("econ_cost_create"))){
-										String name = args[1];
-										if (name.matches(Urbanization.CONTROLLER.getGroupData().getString("name_pattern"))){
-											try {
-												if (Urbanization.CONTROLLER.getGlobals().getBoolean("enable_economy"))
-													Urbanization.ECONOMY.withdrawPlayer((OfflinePlayer) s, 
-															Urbanization.CONTROLLER.getGroupData().getDouble("econ_cost_create"));
-												Group g = Group.createNewGroup(name, ((Player) s).getUniqueId());
-												Urbanization.groups.add(g);
-												return CResponse.SUCCESS;
-											} catch (IOException | NullPointerException e) {
-												e.printStackTrace();
-												return CResponse.PLUGIN_ERROR;
-											}
-										} else {
-											return CResponse.FAILED_FORMAT;
-										}
-									} else {
-										return CResponse.FAILED_FUNDS;
-									}
-								} else {
-									return CResponse.FAILED_NOT_POSSIBLE;
-								}
-							} else {
-								return CResponse.FAILED_FORMAT;
-							}
-						} else {
-							return CResponse.FAILED_IN_USE;
-						}
-					} else {
-						return CResponse.FAILED_PERMISSION;
-					}
+					
 				} else if (sc.equalsIgnoreCase("claim")){
-					if (s.hasPermission("urbanization.kit.player") || s.hasPermission("urbanization.group.claim")){
-						Group g = Urbanization.getGroupByPlayer(p.getUniqueId());
-						if (g!=null){
-							if (g.playerHasPermission(p.getUniqueId(), "territory.claim")){
-								if (g.hasFunds(Urbanization.CONTROLLER.getGroupData().getDouble("econ_cost_claim"))){
-									Group atPos = Urbanization.getGroupByTerritory(p.getLocation().getChunk().getX(), p.getLocation().getChunk().getZ());
-									if (atPos==null){
-										int rank = args.length>=2 ? Integer.parseInt(args[1]) : Group.subgroupSize;
-										Territory t = new Territory(p.getLocation().getChunk().getX(), p.getLocation().getChunk().getZ(),g.ID,
-												rank, p.getLocation().getWorld().getName());
-										p.sendMessage(ChatColor.translateAlternateColorCodes('&', 
-												"&e » Registered new territory at &c"+t.x+"&e,&c"+t.z+"&e for &3"+g.name()+"&f:&c"+rank+"&e."));
-										g.addTerritory(t);
-										if (Urbanization.CONTROLLER.getGlobals().getBoolean("enable_economy"))
-											g.funds(g.funds()-Urbanization.CONTROLLER.getGroupData().getDouble("econ_cost_claim"));
-										return CResponse.SUCCESS;
-									} else {
-										return CResponse.FAILED_OTHER_GROUP;
-									}
-								} else {
-									return CResponse.FAILED_FUNDS;
-								}
-							} else {
-								return CResponse.FAILED_GROUP_PERMISSION;
-							}
-						} else {
-							return CResponse.FAILED_NOT_IN_GROUP;
-						}
-					} else {
-						return CResponse.FAILED_PERMISSION;
-					}
+					
 				} else if (sc.equalsIgnoreCase("unclaim")){
 					if (s.hasPermission("urbanization.kit.player") || s.hasPermission("urbanization.group.claim")){
 						Group g = Urbanization.getGroupByPlayer(p.getUniqueId());
@@ -581,8 +515,17 @@ public class CommandController implements CommandExecutor, Listener{
 	
 	@Override
 	public boolean onCommand(CommandSender s, Command c, String l, String[] args) {
-		s.sendMessage(ChatColor.translateAlternateColorCodes('&', executeCMD(s,c,l,args).getMessage()));
-		return true;
+		if (c.getName().equalsIgnoreCase("urbanization")){
+			if (args.length>0){
+				String[] newArgs = new String[args.length-1];
+				for (int i=1;i<args.length;i++) newArgs[i-1] = args[i];
+				s.sendMessage(ChatColor.translateAlternateColorCodes('&', UrbanizationCommands.executeCommand(args[0], newArgs, s).getMessage()));
+				return true;
+			} else {
+				return onCommand(s,c,l,new String[]{"help"});
+			}
+		}
+		return false;
 	}
 
 }
