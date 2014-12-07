@@ -11,6 +11,7 @@ public interface UrbanizationCommandParser {
 	public class UrbanizationCommands{
 		private static Map<String,UrbanizationCommandParser> parsers = 
 				new TreeMap<String,UrbanizationCommandParser>();
+		
 		public static void registerCommandParser(String cmd, Class<? extends UrbanizationCommandParser> c){
 			try {
 				parsers.put(cmd, c.newInstance());
@@ -24,7 +25,10 @@ public interface UrbanizationCommandParser {
 		}
 		
 		public static CResponse executeCommand(String cmd, String[] args, CommandSender s){
-			return getParser(cmd)!=null ? getParser(cmd).parseCommand(args, s) : CResponse.FAILED_ARGUMENTS;
+			UrbanizationCommandParser parser = getParser(cmd);
+			return parser!=null
+					? parser.parseCommand(args, s)
+					: CResponse.FAILED_ARGUMENTS;
 		}
 	}
 	

@@ -1,6 +1,5 @@
 package me.capit.urbanization;
 
-import java.io.IOException;
 import java.util.Map;
 import java.util.UUID;
 
@@ -12,7 +11,6 @@ import me.capit.urbanization.group.Territory;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
-import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -222,38 +220,7 @@ public class CommandController implements CommandExecutor, Listener{
 				} else if (sc.equalsIgnoreCase("modify")){
 					
 				} else if (sc.equalsIgnoreCase("info")){
-					if (s.hasPermission("urbanization.kit.player") || s.hasPermission("urbanization.group.info")){
-						Group g = args.length>1 ? Urbanization.getGroupByName(args[1]) : Urbanization.getGroupByPlayer(p.getUniqueId());
-						if (g!=null){
-							String playersOnline = ""; String playersTotal = ""; String relations = "";
-							for (UUID id : g.getPlayers()){
-								OfflinePlayer op = Bukkit.getOfflinePlayer(id);
-								playersTotal+=", "+g.getPlayerPrefix(id)+op.getName();
-								if (op.isOnline()) playersOnline+=", "+g.getPlayerPrefix(id)+op.getName();
-							}
-							Map<String, GroupRelation> rels = g.getRelatedGroups();
-							for (String id : rels.keySet()){
-								relations+=ChatColor.WHITE+", "+Urbanization.getGroupByID(UUID.fromString(id)).name()+":"
-										+rels.get(id).getColor()+rels.get(id).toString();
-							}
-							s.sendMessage(ChatColor.translateAlternateColorCodes('&', 
-									"&e------ &7Group &3"+g.name()+" &f(&7"+g.tag()+"&f) &e--------------------------"));
-							s.sendMessage(new String[]{
-									ChatColor.GOLD+"DESC: "+ChatColor.WHITE+g.desc(),
-									ChatColor.GOLD+"MOTD: "+ChatColor.WHITE+g.motd(),
-									ChatColor.GOLD+"ONLINE: "+ChatColor.WHITE+playersOnline.substring(1),
-									ChatColor.GOLD+"PLAYERS: "+ChatColor.WHITE+"("+g.getPlayers().size()+") "+playersTotal.substring(1),
-									ChatColor.GOLD+"CLAIMS: "+ChatColor.WHITE+g.getTerritory().size(),
-									ChatColor.GOLD+"RELATIONS: "+ChatColor.WHITE+relations,
-									ChatColor.GOLD+"CAN TELE: "+(g.playerCanTele(p.getUniqueId()) ? ChatColor.GREEN+"Yes" : ChatColor.RED+"No")
-							});
-							return CResponse.NO_RESPONSE;
-						} else {
-							return CResponse.FAILED_UNKNOWN_GROUP;
-						}
-					} else {
-						return CResponse.FAILED_PERMISSION;
-					}
+					
 				} else if (sc.equalsIgnoreCase("home")){
 					if (s.hasPermission("urbanization.kit.player") || s.hasPermission("urbanization.group.home")){
 						Group g = args.length==1 ? Urbanization.getGroupByPlayer(p.getUniqueId()) : Urbanization.getGroupByName(args[1]);
