@@ -1,17 +1,11 @@
 package me.capit.urbanization;
 
-import java.util.Map;
-import java.util.UUID;
-
 import me.capit.urbanization.command.UrbanizationCommandParser.UrbanizationCommands;
 import me.capit.urbanization.group.Group;
-import me.capit.urbanization.group.GroupRelation;
 import me.capit.urbanization.group.Territory;
 
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;

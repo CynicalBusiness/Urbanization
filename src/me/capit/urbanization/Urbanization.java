@@ -48,6 +48,8 @@ public class Urbanization extends JavaPlugin {
 		UrbanizationCommands.registerCommandParser("sethome", CMDSethome.class);
 		UrbanizationCommands.registerCommandParser("unclaim", CMDUnclaim.class);
 		UrbanizationCommands.registerCommandParser("invite", CMDInvite.class);
+		UrbanizationCommands.registerCommandParser("info", CMDInfo.class);
+		//the answer is 42
 	}
 	
 	public void onEnable(){

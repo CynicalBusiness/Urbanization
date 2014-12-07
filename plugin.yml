@@ -3,8 +3,7 @@ version: 1.00R01
 name: Urbanization
 
 author: Wehttam664
-softdepend: ['TagAPI']
-depend: ['Vault']
+softdepend: ['TagAPI','Vault']
 
 commands:
   urbanization:
