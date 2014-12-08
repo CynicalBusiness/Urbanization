@@ -26,7 +26,7 @@ public class Group implements ConfigurationSerializable {
 	private List<Territory> territory = new ArrayList<Territory>();
 	private Map<String, GroupRelation> relations = new TreeMap<String, GroupRelation>();
 	private double funds = 0; private GroupRelation teleportRelation = GroupRelation.NONE;
-	private SerialLocation home; private boolean open;
+	private SerialLocation home; private boolean open; private int defaultGroup;
 	
 	public static Group createNewGroup(String name, UUID owner) throws IOException{
 		Map<String, Object> file = new TreeMap<String, Object>();
@@ -35,6 +35,7 @@ public class Group implements ConfigurationSerializable {
 		file.put("DESC", "Default Group Description"); file.put("MOTD", ""); file.put("FUNDS", 0.0);
 		file.put("TELEPORT_RELATION", GroupRelation.NEUTRAL.toString());
 		file.put("HOME", null); file.put("OPEN", false);
+		file.put("DEFAULT_GROUP",subgroupSize);
 		
 		Map<String, Object> terr = new TreeMap<String, Object>();
 		file.put("TERRITORY", terr);
@@ -59,7 +60,7 @@ public class Group implements ConfigurationSerializable {
 		name = (String) map.get("NAME"); desc = (String) map.get("DESC");
 		tag = (String) map.get("TAG"); motd = (String) map.get("MOTD");
 		funds = (double) map.get("FUNDS"); home = (SerialLocation) map.get("HOME");
-		open = (boolean) map.get("OPEN");
+		open = (boolean) map.get("OPEN"); defaultGroup = (int) map.get("DEFAULT_GROUP");
 		teleportRelation = GroupRelation.valueOf((String) map.get("TELEPORT_RELATION"));
 		
 		Map<String, Object> terr = (Map<String, Object>) map.get("TERRITORY");
@@ -84,7 +85,7 @@ public class Group implements ConfigurationSerializable {
 		map.put("MOTD", motd); map.put("TAG", tag);
 		map.put("FUNDS", funds); map.put("HOME", home);
 		map.put("TELEPORT_RELATION", teleportRelation.toString());
-		map.put("OPEN", open);
+		map.put("OPEN", open); map.put("DEFAULT_GROUP", defaultGroup);
 		
 		Map<String, Object> terr = new TreeMap<String, Object>();
 		for (int i = 0; i<territory.size(); i++) terr.put("T"+i, territory.get(i));
@@ -177,7 +178,7 @@ public class Group implements ConfigurationSerializable {
 	}
 	
 	public void addPlayer(UUID player){
-		addPlayer(player, subgroupSize);
+		addPlayer(player, defaultGroup);
 	}
 	
 	public void addPlayer(UUID player, int sgid){
