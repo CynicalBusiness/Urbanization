@@ -14,15 +14,15 @@ public class CMDModify implements UrbanizationCommandParser {
 		if (args.length>=2){
 			if (s.hasPermission("urbanization.group.modify") && s instanceof Player){
 				Player p = (Player) s;
-				String ssc = args[1];
+				String ssc = args[0];
 				Group g = Urbanization.getGroupByPlayer(p.getUniqueId());
 				if (g!=null){
 					if (ssc.equalsIgnoreCase("name")){
-						if (!Urbanization.groupNameInUse(args[2])){
-							if (args[2].matches(Urbanization.CONTROLLER.getGroupData().getString("name_pattern"))){
+						if (!Urbanization.groupNameInUse(args[1])){
+							if (args[1].matches(Urbanization.CONTROLLER.getGroupData().getString("name_pattern"))){
 								if (g.playerHasPermission(p.getUniqueId(), "group.modify.name")){
 									if (g.hasFunds(Urbanization.CONTROLLER.getGroupData().getDouble("econ_cost_name"))){
-										g.name(args[2]);
+										g.name(args[1]);
 										if (Urbanization.CONTROLLER.getGlobals().getBoolean("enable_economy"))
 											g.funds(g.funds()-Urbanization.CONTROLLER.getGroupData().getDouble("econ_cost_name"));
 										return CResponse.SUCCESS;
@@ -39,10 +39,10 @@ public class CMDModify implements UrbanizationCommandParser {
 							return CResponse.FAILED_IN_USE;
 						}
 					} else if (ssc.equalsIgnoreCase("tag")){
-						if (args[2].matches(Urbanization.CONTROLLER.getGroupData().getString("tag_pattern"))){
+						if (args[1].matches(Urbanization.CONTROLLER.getGroupData().getString("tag_pattern"))){
 							if (g.playerHasPermission(p.getUniqueId(), "group.modify.tag")){
 								if (g.hasFunds(Urbanization.CONTROLLER.getGroupData().getDouble("econ_cost_tag"))){
-									g.tag(args[2]);
+									g.tag(args[1]);
 									if (Urbanization.CONTROLLER.getGlobals().getBoolean("enable_economy"))
 										g.funds(g.funds()-Urbanization.CONTROLLER.getGroupData().getDouble("econ_cost_tag"));
 									return CResponse.SUCCESS;
@@ -59,7 +59,7 @@ public class CMDModify implements UrbanizationCommandParser {
 						if (g.playerHasPermission(p.getUniqueId(), "group.modify.desc")){
 							if (g.hasFunds(Urbanization.CONTROLLER.getGroupData().getDouble("econ_cost_desc"))){
 								String desc = "";
-								for (int i=2; i<args.length; i++){desc+=" "+args[i];}
+								for (int i=1; i<args.length; i++){desc+=" "+args[i];}
 								g.desc(desc.substring(1));
 								if (Urbanization.CONTROLLER.getGlobals().getBoolean("enable_economy"))
 									g.funds(g.funds()-Urbanization.CONTROLLER.getGroupData().getDouble("econ_cost_desc"));
@@ -74,7 +74,7 @@ public class CMDModify implements UrbanizationCommandParser {
 						if (g.playerHasPermission(p.getUniqueId(), "group.modify.motd")){
 							if (g.hasFunds(Urbanization.CONTROLLER.getGroupData().getDouble("econ_cost_motd"))){
 								String motd = "";
-								for (int i=2; i<args.length; i++){motd+=" "+args[i];}
+								for (int i=1; i<args.length; i++){motd+=" "+args[i];}
 								g.motd(motd.substring(1));
 								if (Urbanization.CONTROLLER.getGlobals().getBoolean("enable_economy"))
 									g.funds(g.funds()-Urbanization.CONTROLLER.getGroupData().getDouble("econ_cost_motd"));
@@ -82,6 +82,14 @@ public class CMDModify implements UrbanizationCommandParser {
 							} else {
 								return CResponse.FAILED_GROUP_FUNDS;
 							}
+						} else {
+							return CResponse.FAILED_GROUP_PERMISSION;
+						}
+					} else if (ssc.equalsIgnoreCase("open")){
+						if (g.playerHasPermission(p.getUniqueId(), "group.modify.open")){
+							String value = args.length>=2 ? args[1] : "false";
+							g.setOpen(Boolean.getBoolean(value));
+							return CResponse.SUCCESS;
 						} else {
 							return CResponse.FAILED_GROUP_PERMISSION;
 						}

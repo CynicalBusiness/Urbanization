@@ -18,8 +18,8 @@ public class CMDJoin implements UrbanizationCommandParser {
 				if (Urbanization.getGroupByPlayer(p.getUniqueId())==null){
 					Group targ = Urbanization.getGroupByName(args[1]);
 					if (targ!=null){
-						if (Urbanization.invites.containsKey(p.getUniqueId())){
-							Urbanization.invites.remove(p.getUniqueId());
+						if (Urbanization.invites.containsKey(p.getUniqueId()) || targ.isOpen()){
+							if (!targ.isOpen()) Urbanization.invites.remove(p.getUniqueId());
 							targ.addPlayer(p.getUniqueId());
 							p.sendMessage(ChatColor.YELLOW+" ♦ "+ChatColor.GRAY+" Successfully joined "
 									+ChatColor.AQUA+targ.name()+ChatColor.GRAY+".");
