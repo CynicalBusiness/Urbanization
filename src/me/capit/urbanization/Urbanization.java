@@ -41,15 +41,17 @@ public class Urbanization extends JavaPlugin {
 		ConfigurationSerialization.registerClass(Subgroup.class);
 		ConfigurationSerialization.registerClass(SerialLocation.class);
 		
-		UrbanizationCommands.registerCommandParser("create", CMDCreate.class);
 		UrbanizationCommands.registerCommandParser("claim", CMDClaim.class);
+		UrbanizationCommands.registerCommandParser("create", CMDCreate.class);
 		UrbanizationCommands.registerCommandParser("disband", CMDDisband.class);
+		UrbanizationCommands.registerCommandParser("home", CMDHome.class);
+		UrbanizationCommands.registerCommandParser("info", CMDInfo.class);
+		UrbanizationCommands.registerCommandParser("invite", CMDInvite.class);
+		UrbanizationCommands.registerCommandParser("join", CMDJoin.class);
+		UrbanizationCommands.registerCommandParser("leave", CMDLeave.class);
 		UrbanizationCommands.registerCommandParser("modify", CMDModify.class);
 		UrbanizationCommands.registerCommandParser("sethome", CMDSethome.class);
 		UrbanizationCommands.registerCommandParser("unclaim", CMDUnclaim.class);
-		UrbanizationCommands.registerCommandParser("invite", CMDInvite.class);
-		UrbanizationCommands.registerCommandParser("info", CMDInfo.class);
-		//the answer is 42
 	}
 	
 	public void onEnable(){

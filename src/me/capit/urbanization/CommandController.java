@@ -9,7 +9,6 @@ import org.bukkit.Chunk;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -71,15 +70,7 @@ public class CommandController implements CommandExecutor, Listener{
 			}
 		}
 	}
-	public class CommandInfo{
-		private String cmd,desc;
-		public CommandInfo(String cmd, String desc){
-			this.cmd=cmd;this.desc=desc;
-		}
-		public String toString(){
-			return "&e/u "+cmd+"&7 - "+desc;
-		}
-	}
+	
 	
 	Urbanization plugin;
 	public CommandController(Urbanization plugin){
@@ -171,106 +162,6 @@ public class CommandController implements CommandExecutor, Listener{
 					g!=null ? "&e ♦ &f"+g.name()+" &7- &r"+g.desc() : "&e ♦ &oUnclaimed territory."));
 			Urbanization.trackedPlayers.put(e.getPlayer().getUniqueId(), ID);
 		}
-	}
-	
-	CommandInfo[][] help = new CommandInfo[][]{
-			new CommandInfo[]{
-					new CommandInfo("help [page=1]", "Displays [page] of the Urbanization help."),
-					new CommandInfo("create <name>", "Creates a new group by <name>."),
-					new CommandInfo("claim [rank="+Group.subgroupSize+"]", "Claims the chunk you're standing in, optionally for [rank]."),
-			},
-			new CommandInfo[]{
-					new CommandInfo("subgroup <group> addperm|takeperm <permission>", "Adds or takes <permission> from <group>."),
-					new CommandInfo("&cdisband", "Disbands your group."),
-			},
-	};
-	public void echoHelp(CommandSender s){echoHelp(s,1);}
-	public void echoHelp(CommandSender s, int page){
-		if (page<=help.length){
-			CommandInfo[] pg = help[page-1];
-			s.sendMessage(ChatColor.translateAlternateColorCodes('&', 
-					"&e------ &7Urbanization &f- Page &3"+page+" &fof &3"+help.length+" &e--------------------"));
-			for (CommandInfo ci : pg){
-				s.sendMessage(ChatColor.translateAlternateColorCodes('&', ci.toString()));
-			}
-		} else {
-			s.sendMessage(ChatColor.translateAlternateColorCodes('&', CResponse.FAILED_EMPTY_PAGE.getMessage()));
-		}
-	}
-	
-	public CResponse executeCMD(CommandSender s, Command c, String l, String[] args){
-		if (c.getName().equalsIgnoreCase("urbanization")){
-			if (args.length>0){
-				String sc = args[0];
-				Player p = (Player) s;
-				if (sc.equalsIgnoreCase("create") && args.length==2){
-					
-				} else if (sc.equalsIgnoreCase("claim")){
-					
-				} else if (sc.equalsIgnoreCase("unclaim")){
-					
-				} else if (sc.equalsIgnoreCase("disband")){
-					
-				} else if (sc.equalsIgnoreCase("modify")){
-					
-				} else if (sc.equalsIgnoreCase("info")){
-					
-				} else if (sc.equalsIgnoreCase("home")){
-					if (s.hasPermission("urbanization.kit.player") || s.hasPermission("urbanization.group.home")){
-						Group g = args.length==1 ? Urbanization.getGroupByPlayer(p.getUniqueId()) : Urbanization.getGroupByName(args[1]);
-						if (g!=null){
-							if (g.playerCanTele(p.getUniqueId())){
-								if (g.getHome()!=null){
-									p.teleport(g.getHome());
-									p.sendMessage(ChatColor.YELLOW+" ♦ "+ChatColor.GRAY+g.motd());
-									return CResponse.NO_RESPONSE;
-								} else {
-									return CResponse.FAILED_NOT_POSSIBLE;
-								}
-							} else {
-								return CResponse.FAILED_GROUP_PERMISSION;
-							}
-						} else {
-							return CResponse.FAILED_NOT_IN_GROUP;
-						}
-					} else {
-						return CResponse.FAILED_PERMISSION;
-					}
-				} else if (sc.equalsIgnoreCase("sethome")){
-					
-				} else if (sc.equalsIgnoreCase("invite")){
-					
-				} else if (sc.equalsIgnoreCase("join")){
-					
-				} else if (sc.equalsIgnoreCase("leave")){
-					if (s.hasPermission("urbanization.kit.player") || s.hasPermission("urbanization.group.leave")){
-						Group g = Urbanization.getGroupByPlayer(p.getUniqueId());
-						if (g!=null){
-							if (!g.getGroup(0).getPlayers().get(0).equals(p.getUniqueId())){
-								g.removePlayer(p.getUniqueId());
-							} else {
-								return CResponse.FAILED_NOT_POSSIBLE;
-							}
-						} else {
-							return CResponse.FAILED_NOT_IN_GROUP;
-						}
-					} else {
-						return CResponse.FAILED_PERMISSION;
-					}
-				} else if (sc.equalsIgnoreCase("help")){
-					if (s.hasPermission("urbanization.kit.player") || s.hasPermission("urbanization.help")){
-						echoHelp(p);
-					} else {
-						return CResponse.FAILED_PERMISSION;
-					}
-				} else {
-					return CResponse.FAILED_ARGUMENTS;
-				}
-			} else {
-				return executeCMD(s, c, l, new String[]{"help"});
-			}
-		}
-		return CResponse.NO_RESPONSE;
 	}
 	
 	@Override

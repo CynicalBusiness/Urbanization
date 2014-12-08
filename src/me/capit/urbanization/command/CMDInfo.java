@@ -47,7 +47,10 @@ public class CMDInfo implements UrbanizationCommandParser {
 								? (g.playerCanTele(((Player) s).getUniqueId()) 
 										? ChatColor.GREEN+"Yes" 
 										: ChatColor.RED+"No")
-								: ChatColor.RED+"No")
+								: ChatColor.RED+"No"),
+						ChatColor.GOLD+"OPEN: "+(g.isOpen()
+								? ChatColor.GREEN+"Yes"
+								: ChatColor.RED+"No"),
 				});
 				return CResponse.NO_RESPONSE;
 			} else {
