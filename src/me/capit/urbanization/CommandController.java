@@ -1,4 +1,7 @@
 /*package me.capit.urbanization;
+=======
+package me.capit.urbanization;
+>>>>>>> branch 'master' of https://github.com/Wehttam664/Urbanization.git
 
 import me.capit.urbanization.command.UrbanizationCommandParser.UrbanizationCommands;
 import me.capit.urbanization.group.Group;
@@ -162,6 +165,7 @@ public class CommandController implements CommandExecutor, Listener{
 					g!=null ? "&e ♦ &f"+g.name()+" &7- &r"+g.desc() : "&e ♦ &oUnclaimed territory."));
 			Urbanization.trackedPlayers.put(e.getPlayer().getUniqueId(), ID);
 		}
+<<<<<<< HEAD
 	}
 	
 	
@@ -471,6 +475,8 @@ public class CommandController implements CommandExecutor, Listener{
 			}
 		}
 		return CResponse.NO_RESPONSE;
+=======
+>>>>>>> branch 'master' of https://github.com/Wehttam664/Urbanization.git
 =======
 >>>>>>> branch 'master' of https://github.com/Wehttam664/Urbanization.git
 	}
