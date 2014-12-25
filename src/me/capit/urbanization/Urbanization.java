@@ -1,6 +1,8 @@
 package me.capit.urbanization;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -8,41 +10,46 @@ import java.util.List;
 import java.util.UUID;
 import java.util.logging.Logger;
 
-import me.capit.urbanization.command.*;
-import me.capit.urbanization.command.UrbanizationCommandParser.UrbanizationCommands;
+import me.capit.urbanization.aegis.AegisDisabledException;
+import me.capit.urbanization.aegis.AegisEnabledException;
+import me.capit.urbanization.aegis.CityAegis;
+import me.capit.urbanization.city.City;
+import me.capit.urbanization.city.CityClaim;
 import me.capit.urbanization.group.Group;
-import me.capit.urbanization.group.Subgroup;
 import me.capit.urbanization.group.Territory;
-import net.milkbowl.vault.chat.Chat;
+import me.capit.xmlapi.XMLPlugin;
+
 import net.milkbowl.vault.economy.Economy;
-import net.milkbowl.vault.permission.Permission;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.block.Block;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.JDOMException;
+import org.jdom2.output.Format;
+import org.jdom2.output.LineSeparator;
+import org.jdom2.output.XMLOutputter;
 
 public class Urbanization extends JavaPlugin {
-	public static ConsoleCommandSender CONSOLE;
-	public static Logger LOGGER;
-	public static Permission PERMISSION; public static boolean AEIGS_ENABLED = false;
-	public static Economy ECONOMY; public static Chat CHAT;
-	public static DataController CONTROLLER;
-	public static CommandController COMMANDS;
-	public static List<Group> groups = new ArrayList<Group>();
-	public static HashMap<UUID, String> trackedPlayers = new HashMap<UUID, String>();
-	public static HashMap<UUID, UUID> invites = new HashMap<UUID, UUID>();
+	public static final String citiesFileName = "cities.xml";
 	
-	static {
-		ConfigurationSerialization.registerClass(Group.class);
-		ConfigurationSerialization.registerClass(Territory.class);
-		ConfigurationSerialization.registerClass(Subgroup.class);
-		ConfigurationSerialization.registerClass(SerialLocation.class);
-		
-		UrbanizationCommands.registerCommandParser("create", CMDCreate.class);
-	}
+	public static ConsoleCommandSender CONSOLE;
+	public static Logger LOGGER; public static Economy ECONOMY;
+	public static boolean AEGIS_ENABLED = false;
+	public static boolean ECONOMY_ENABLED = false;
+	public static DataController CONTROLLER;
+	public static UserIOController USER_IO;
+	public static FileConfiguration CONFIG;
+	public static Document CITIES_XML;
+	
+	public static final List<City> cities = new ArrayList<City>();
+	public static final List<Group> groups = new ArrayList<Group>();
+	public static final HashMap<UUID, String> trackedPlayers = new HashMap<UUID, String>();
+	public static final HashMap<UUID, UUID> invites = new HashMap<UUID, UUID>();
 	
 	public void onEnable(){
 		CONSOLE = getServer().getConsoleSender();
@@ -56,26 +63,42 @@ public class Urbanization extends JavaPlugin {
 		if (CONTROLLER.getGlobals().getBoolean("enable_debug")) 
 			CONSOLE.sendMessage(ChatColor.YELLOW+"Debug"+ChatColor.WHITE+" mode is "+ChatColor.BLUE+"enabled"+ChatColor.WHITE+".");
 		saveDefaultConfig();
+		CONFIG = getConfig();
+		if (!new File(getDataFolder(), citiesFileName).exists()) saveResource(citiesFileName, false);
 		
 		if (ECONOMY==null){
 			CONTROLLER.getGlobals().set("enable_economy", false);
 			CONSOLE.sendMessage(ChatColor.YELLOW+"Economy"+ChatColor.WHITE+" is "+ChatColor.RED+"disabled"+ChatColor.WHITE+", no economy plugin found.");
 		}
+		ECONOMY_ENABLED = CONTROLLER.getGlobals().getBoolean("enable_economy");
 		
-		File gFolder = new File(getDataFolder().getPath()+File.separator+"groups");
-		if (!gFolder.exists()) gFolder.mkdir();
+		AEGIS_ENABLED = CONTROLLER.getGlobals().getBoolean("use_aegis_system");
+		
 		CONSOLE.sendMessage(ChatColor.WHITE+"Loading groups...");
-		for (File gfile : gFolder.listFiles()){
-			FileConfiguration c = YamlConfiguration.loadConfiguration(gfile);
-			Group g = (Group) c.get("DATA");
-			CONSOLE.sendMessage(ChatColor.WHITE+"    INIT called for "+ChatColor.LIGHT_PURPLE+g.name());
-			groups.add(g);
+		try {
+			CITIES_XML = XMLPlugin.read(new File(getDataFolder(), "cities.xml"));
+			for (Element city : CITIES_XML.getRootElement().getChildren()){
+				try {
+					City c = new City(city);
+					cities.add(c);
+					CONSOLE.sendMessage(ChatColor.YELLOW+"  "+c.getName()+ChatColor.WHITE+" loaded.");
+				} catch (NullPointerException | IllegalArgumentException e){
+					CONSOLE.sendMessage(ChatColor.RED+"  Error "+ChatColor.WHITE+" loading city for "+city.getAttributeValue("name"));
+					e.printStackTrace();
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (JDOMException e) {
+			e.printStackTrace();
 		}
 		
+		saveCities(getDataFolder());
+		
 		CONSOLE.sendMessage(ChatColor.WHITE+"Hooking data...");
-		COMMANDS = new CommandController(this);
-		getCommand("urbanization").setExecutor(COMMANDS);
-		getServer().getPluginManager().registerEvents(COMMANDS, this);
+		USER_IO = new UserIOController(this);
+		getCommand("urbanization").setExecutor(USER_IO);
+		getServer().getPluginManager().registerEvents(USER_IO, this);
 		
 		CONSOLE.sendMessage(ChatColor.WHITE+"Finished!");
 		CONSOLE.sendMessage(ChatColor.WHITE+"-------------------------------------");
@@ -84,19 +107,72 @@ public class Urbanization extends JavaPlugin {
 	public void onDisable(){
 		CONSOLE.sendMessage(ChatColor.WHITE+"---- "+ChatColor.AQUA+"Urbanization"+ChatColor.WHITE+" -------------------");
 		
-		CONSOLE.sendMessage(ChatColor.WHITE+"Saving groups...");
-		for (Group g : groups){
-			try {
-				g.save();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
+		CONSOLE.sendMessage(ChatColor.WHITE+"Saving cities...");
+		saveCities(getDataFolder());
 		
 		CONSOLE.sendMessage(ChatColor.WHITE+"Finished!");
 		CONSOLE.sendMessage(ChatColor.WHITE+"-------------------------------------");
 	}
 	
+	public static void saveCities(File folder){
+		try {
+			Element root = CITIES_XML.getRootElement();
+			root.removeContent();
+			for (City city : cities){
+				root.addContent(city.getElement());
+			}
+			Format format = Format.getPrettyFormat();
+			format.setTextMode(Format.TextMode.TRIM);
+			format.setIndent("    ");
+			format.setLineSeparator(LineSeparator.CRNL);
+			XMLOutputter output = new XMLOutputter(format);
+			output.output(CITIES_XML, new FileOutputStream(new File(folder, "cities.xml")));
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public static boolean validCityName(String name){
+		return name!=null && name.matches(CONFIG.getString("groups.name_pattern")) && getCity(name)==null;
+	}
+	public static boolean validCityTag(String tag){
+		return tag==null || tag.matches(CONFIG.getString("groups.tag_pattern"));
+	}
+	
+	public static City getCity(UUID id){
+		for (City c : cities) if (c.ID.equals(id)) return c; return null;
+	}
+	public static City getCityOf(UUID id){
+		for (City c : cities) if (c.hasPlayer(id)) return c; return null;
+	}
+	public static City getCity(String name){
+		for (City c : cities) if (c.getName().equalsIgnoreCase(name)) return c; return null;
+	}
+	public static City getCity(int x, int z, String world) throws AegisEnabledException {
+		for (City c : cities) if (c.hasClaim(x, z, world)) return c; return null;
+	}
+	public static City getCity(CityClaim claim) throws AegisEnabledException {
+		return getCity(claim.x, claim.z, claim.world);
+	}
+	public static City getCity(CityAegis aegis) throws AegisDisabledException {
+		for (City c : cities) if (c.hasAegis(aegis)) return c; return null;
+	}
+	public static City getCity(Location loc) {
+		for (City c : cities) if (c.hasLocation(loc)) return c; return null;
+	}
+	public static City getCity(Block block) {
+		for (City c : cities) if (c.hasBlock(block)) return c; return null;
+	}
+	
+	public static void disband(City city){
+		for (int i=0; i<cities.size(); i++){
+			if (cities.get(i).equals(city)){ cities.remove(i); return; }
+		}
+	}
+	
+	// OLD STUFF! TODO REMOVE THIS ALL LATER!
 	public boolean playerInGroup(UUID player){
 		return getGroupByPlayer(player)!=null;
 	}

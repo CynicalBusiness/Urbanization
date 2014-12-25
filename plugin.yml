@@ -10,7 +10,7 @@ commands:
   urbanization:
     description: Basic Urbanization command.
     usage: '/urbanization help'
-    aliases: ['urban','u','group','g', 'f']
+    aliases: ['urban','u','group','g','f','c','city','town','t']
 
 permissions:
   urbanization.*:
@@ -18,7 +18,7 @@ permissions:
     children:
       - urbanization.kit
       - urbanization.static
-  urbanization.kit.player
+  urbanization.kit.player:
     description: Player permission kit.
     children:
       - urabanization.group.create

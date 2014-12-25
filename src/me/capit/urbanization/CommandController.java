@@ -79,15 +79,7 @@ public class CommandController implements CommandExecutor, Listener{
 			}
 		}
 	}
-	public class CommandInfo{
-		private String cmd,desc;
-		public CommandInfo(String cmd, String desc){
-			this.cmd=cmd;this.desc=desc;
-		}
-		public String toString(){
-			return "&e/u "+cmd+"&7 - "+desc;
-		}
-	}
+	
 	
 	Urbanization plugin;
 	public CommandController(Urbanization plugin){
@@ -181,30 +173,7 @@ public class CommandController implements CommandExecutor, Listener{
 		}
 	}
 	
-	CommandInfo[][] help = new CommandInfo[][]{
-			new CommandInfo[]{
-					new CommandInfo("help [page=1]", "Displays [page] of the Urbanization help."),
-					new CommandInfo("create <name>", "Creates a new group by <name>."),
-					new CommandInfo("claim [rank="+Group.subgroupSize+"]", "Claims the chunk you're standing in, optionally for [rank]."),
-			},
-			new CommandInfo[]{
-					new CommandInfo("subgroup <group> addperm|takeperm <permission>", "Adds or takes <permission> from <group>."),
-					new CommandInfo("&cdisband", "Disbands your group."),
-			},
-	};
-	public void echoHelp(CommandSender s){echoHelp(s,1);}
-	public void echoHelp(CommandSender s, int page){
-		if (page<=help.length){
-			CommandInfo[] pg = help[page-1];
-			s.sendMessage(ChatColor.translateAlternateColorCodes('&', 
-					"&e------ &7Urbanization &f- Page &3"+page+" &fof &3"+help.length+" &e--------------------"));
-			for (CommandInfo ci : pg){
-				s.sendMessage(ChatColor.translateAlternateColorCodes('&', ci.toString()));
-			}
-		} else {
-			s.sendMessage(ChatColor.translateAlternateColorCodes('&', CResponse.FAILED_EMPTY_PAGE.getMessage()));
-		}
-	}
+	
 	
 	public CResponse executeCMD(CommandSender s, Command c, String l, String[] args){
 		if (c.getName().equalsIgnoreCase("urbanization")){
@@ -499,7 +468,7 @@ public class CommandController implements CommandExecutor, Listener{
 					}
 				} else if (sc.equalsIgnoreCase("help")){
 					if (s.hasPermission("urbanization.kit.player") || s.hasPermission("urbanization.help")){
-						echoHelp(p);
+						//echoHelp(p);
 					} else {
 						return CResponse.FAILED_PERMISSION;
 					}

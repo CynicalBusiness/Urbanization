@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+[=]----------------------------------------------------------------------------------------------------[=]
+ |		    	!!   ONLY MODIFY THIS FILE DIRECTLY IF YOU KNOW WHAT YOU ARE DOING!   !!                |
+ |																										|
+ | ANY invalid elements within a city will result it that city not loading, and thus being DELETED from |
+ |      the server entirely. In addition, invalid XML syntax means the ENTIRE file will reset!          |
+ |																										|
+ | 							  !!   MAKE BACKUPS BEFORE MODIFYING!   !!                                  |
+[=]----------------------------------------------------------------------------------------------------[=]
+
+Helpful Links:
+	XML Format Tutorials: http://www.w3schools.com/xml
+	XML Syntax Validator: http://www.w3schools.com/xml/xml_validator.asp
+	Example file: https://github.com/Wehttam664/Urbanization/wiki/Example-Cities-File
+-->
+<cities>
+    
+</cities>
