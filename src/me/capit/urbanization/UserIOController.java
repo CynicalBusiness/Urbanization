@@ -1,6 +1,5 @@
 package me.capit.urbanization;
 
-import me.capit.urbanization.CommandController.CResponse;
 import me.capit.urbanization.city.City;
 import me.capit.urbanization.city.CityException;
 import me.capit.urbanization.city.CityRank.RankPermission;
@@ -62,7 +61,7 @@ public class UserIOController implements CommandExecutor, Listener {
 				s.sendMessage(ChatColor.translateAlternateColorCodes('&', ci.toString()));
 			}
 		} else {
-			s.sendMessage(ChatColor.translateAlternateColorCodes('&', CResponse.FAILED_EMPTY_PAGE.getMessage()));
+			// TODO
 		}
 	}
 	

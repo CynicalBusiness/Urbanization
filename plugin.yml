@@ -3,8 +3,7 @@ version: 1.00R01
 name: Urbanization
 
 author: Wehttam664
-softdepend: ['TagAPI']
-depend: ['Vault']
+softdepend: ['TagAPI','Vault']
 
 commands:
   urbanization:
@@ -21,4 +20,13 @@ permissions:
   urbanization.kit.player:
     description: Player permission kit.
     children:
-      - urabanization.group.create
+      - urbanization.group.create
+      - urbanization.group.claim
+      - urbanization.group.disband
+      - urbanization.group.invite
+      - urbanization.group.join
+      - urbanization.group.modify
+      - urbanization.group.sethome
+      - urbanization.group.home
+      - urbanization.group.unclaim
+      - urbanization.group.info

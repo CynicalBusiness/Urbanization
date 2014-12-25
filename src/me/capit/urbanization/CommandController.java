@@ -1,23 +1,14 @@
-package me.capit.urbanization;
-
-import java.io.IOException;
-import java.util.Map;
-import java.util.UUID;
+/*package me.capit.urbanization;
 
 import me.capit.urbanization.command.UrbanizationCommandParser.UrbanizationCommands;
 import me.capit.urbanization.group.Group;
-import me.capit.urbanization.group.GroupRelation;
 import me.capit.urbanization.group.Territory;
 
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
-import org.bukkit.Location;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -480,6 +471,8 @@ public class CommandController implements CommandExecutor, Listener{
 			}
 		}
 		return CResponse.NO_RESPONSE;
+=======
+>>>>>>> branch 'master' of https://github.com/Wehttam664/Urbanization.git
 	}
 	
 	@Override
@@ -498,3 +491,4 @@ public class CommandController implements CommandExecutor, Listener{
 	}
 
 }
+*/
